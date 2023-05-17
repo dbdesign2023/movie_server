@@ -27,8 +27,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.debug("jwt filter chain initiated");
+        log.info("filter came");
         String token = resolveToken(request);
-
         if(token != null) {
             try {
                 int validation = jwtTokenProvider.validateToken(token);
@@ -50,6 +50,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     private String resolveToken(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
+
+        log.info("token: " + token);
         if(StringUtils.hasText(token) && token.startsWith(BEARER_PREFIX)) {
             return token.substring(7);
         }

@@ -25,6 +25,7 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtTokenProvider jwtTokenProvider;
+    private final CorsConfig corsConfig;
 
     private static final String[] URL_TO_PERMIT = {
             "/customer/signup",
@@ -47,7 +48,6 @@ public class SecurityConfig {
             "/theater/{id}/seat/modify",
             "/theater/{id}/delete",
             "/theater/{id}/seat/delete"
-
     };
 
     @Bean
@@ -67,6 +67,7 @@ public class SecurityConfig {
                 .sessionManagement()     //세션은 stateless방식
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
+
                 .and()
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
@@ -83,6 +84,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated();
 
         http
+                .addFilter(corsConfig.corsFilter())
                 .addFilterBefore(new JwtRequestFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
