@@ -6,6 +6,7 @@ import dbclass.movie.domain.theater.Theater;
 import dbclass.movie.dto.theater.*;
 import dbclass.movie.exceptionHandler.DataExistsException;
 import dbclass.movie.exceptionHandler.DataNotExistsException;
+import dbclass.movie.mapper.SeatMapper;
 import dbclass.movie.mapper.TheaterMapper;
 import dbclass.movie.repository.SeatRepository;
 import dbclass.movie.repository.TheaterRepository;
@@ -40,7 +41,7 @@ public class TheaterService {
     public void registerSeat(Long theaterId, List<SeatRegisterDTO> seatToRegister) {
         Theater theater = theaterRepository.findById(theaterId).orElseThrow(() -> new DataNotExistsException("존재하지 않는 상영관ID입니다.", "Theater"));
 
-        List<Seat> seats = seatToRegister.stream().map(seatRegisterDTO -> TheaterMapper.seatRegisterDTOToSeat(seatRegisterDTO, theater)).collect(Collectors.toList());
+        List<Seat> seats = seatToRegister.stream().map(seatRegisterDTO -> SeatMapper.seatRegisterDTOToSeat(seatRegisterDTO, theater)).collect(Collectors.toList());
         seatRepository.saveAll(seats.stream().distinct().collect(Collectors.toList()));
     }
 
@@ -54,13 +55,9 @@ public class TheaterService {
     public List<SeatDTO> getSeats(Long theaterId) {
         Theater theater = theaterRepository.findById(theaterId).orElseThrow(() -> new DataNotExistsException("존재하지 않는 상영관입니다.", "Theater"));
 
-        List<Seat> seats = seatRepository.findAllByTheaterOrderBySeatIdAsc(theater);
+        List<Seat> seats = seatRepository.findAllByTheaterOrderByRowAscOrderByColumnAsc(theater);
 
-        return seats.stream().map(seat -> seatToSeatDTOMapper(seat)).collect(Collectors.toList());
-    }
-
-    private SeatDTO seatToSeatDTOMapper(Seat seat) {
-        return TheaterMapper.seatToSeatDTO(seat);
+        return seats.stream().map(seat -> SeatMapper.seatToSeatDTO(seat)).collect(Collectors.toList());
     }
 
     @Transactional
@@ -91,7 +88,7 @@ public class TheaterService {
             seatRepository.deleteById(seatId);
         }
 
-        seatRepository.save(TheaterMapper.seatRegisterDTOToSeat(seatToModify, theater));
+        seatRepository.save(SeatMapper.seatRegisterDTOToSeat(seatToModify, theater));
     }
 
     @Transactional

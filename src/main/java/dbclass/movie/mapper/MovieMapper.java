@@ -92,6 +92,18 @@ public class MovieMapper {
                 .build();
     }
 
+    public static MovieTitleDTO movieToMovieTitleDTO(Movie movie) {
+
+        String fileName = movie.getPoster().getUuid() + "_" + movie.getPoster().getFileName();
+
+        return MovieTitleDTO.builder()
+                .title(movie.getTitle())
+                .movieId(movie.getMovieId())
+                .rating(ratingToRatingDTO(movie.getRating()))
+                .fileName(fileName)
+                .build();
+    }
+
     private static PosterDTO posterToPosterDTO(Poster poster) {
         return PosterDTO.builder()
                 .posterId(poster.getPosterId())

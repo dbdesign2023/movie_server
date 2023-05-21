@@ -3,7 +3,6 @@ package dbclass.movie.service;
 import dbclass.movie.domain.user.Customer;
 import dbclass.movie.domain.user.Role;
 import dbclass.movie.domain.user.UserAuthority;
-import dbclass.movie.domain.user.UserAuthorityId;
 import dbclass.movie.dto.user.CustomerInfoDTO;
 import dbclass.movie.dto.user.CustomerInfoToClientDTO;
 import dbclass.movie.dto.user.LoginDTO;
@@ -22,8 +21,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.sql.Date;
 
 @Service
 @Log4j2
@@ -94,11 +91,8 @@ public class CustomerService {
         if((modifyDTO.getPassword() != null && modifyDTO.getPassword() != "")) {
             customerRepository.updatePassword(modifyDTO.getPassword(), loginId);
 
-            UserAuthorityId id = UserAuthorityId.builder()
-                    .loginId(modifyCustomer.getLoginId())
-                    .authority(Role.ROLE_USER.getType())
-                    .build();
-            UserAuthority authority = authorityRepository.findById(id).orElseThrow(() -> new RuntimeException("존재하지 않는 권한입니다."));
+
+            UserAuthority authority = authorityRepository.findById(loginId).orElseThrow(() -> new RuntimeException("존재하지 않는 권한입니다."));
             authority.setPassword(modifyCustomer.getPassword());
             authorityRepository.save(authority);
         }
@@ -109,6 +103,7 @@ public class CustomerService {
         Customer customer = customerRepository.findByLoginId(loginId).orElseThrow(() -> new DataNotExistsException("존재하지 않는 토큰입니다.", "User"));
         if(passwordEncoder.matches(password, customer.getPassword())) {
             customerRepository.deleteById(customer.getId());
+            authorityRepository.deleteById(loginId);
         }
         else {
             throw new InvalidAccessException("잘못된 비밀번호입니다.");

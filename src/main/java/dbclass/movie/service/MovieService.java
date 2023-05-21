@@ -176,6 +176,18 @@ public class MovieService {
         return genreRepository.findAll().stream().map(genre -> MovieMapper.genreToGenreDTO(genre)).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public MovieDTO getMovie(Long movieId) {
+        Movie movie = movieRepository.findById(movieId).orElseThrow(() -> new DataNotExistsException("존재하지 않는 영화 ID입니다.", "movie"));
+
+        return MovieMapper.movieToMovieDTO(movie);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean hasPoster(String path) {
+        return posterRepository.existsByFileUrl(path);
+    }
+
 //
 //    @Transactional
 //    public void addGenreToMovie()
