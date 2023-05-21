@@ -68,4 +68,10 @@ public class MovieController {
     public List<GenreDTO> getGenreList() {
         return movieService.loadGenreList();
     }
+
+//    @GetMapping("/{id}")
+//    public MovieDTO getMovieDetail(@RequestParam("id") Long movieId) {
+//        MovieDTO movieDTO = movieService.getMovie(movieId);
+//    }
+
 }
