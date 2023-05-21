@@ -6,6 +6,9 @@ import dbclass.movie.domain.user.UserAuthority;
 import dbclass.movie.dto.user.AdminInfoDTO;
 import dbclass.movie.dto.user.LoginDTO;
 import dbclass.movie.exceptionHandler.DataExistsException;
+import dbclass.movie.exceptionHandler.DataNotExistsException;
+import dbclass.movie.exceptionHandler.InvalidAccessException;
+import dbclass.movie.mapper.AdminMapper;
 import dbclass.movie.repository.AdminRepository;
 import dbclass.movie.repository.AuthorityRepository;
 import dbclass.movie.security.JwtToken;
@@ -14,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,5 +65,32 @@ public class AdminService {
         authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
         return tokenProvider.createToken(loginDTO.getLoginId(), Role.ROLE_ADMIN);
+    }
+
+    @Transactional
+    public AdminInfoDTO updateAdminData(AdminInfoDTO modifyDTO, String loginId) {
+        if(!modifyDTO.getLoginId().equals(loginId)) {
+            throw new InvalidAccessException("관리자 ID가 변경시도 되었습니다. 다시 시도해주세요.");
+        }
+
+        Admin admin = adminRepository.findByLoginId(loginId).orElseThrow(() -> new DataNotExistsException("존재하지 않는 회원입니다.", "User"));
+
+        if(modifyDTO.getPassword() == null) {
+            modifyDTO.setPassword(admin.getPassword());
+        }
+
+        return AdminMapper.adminToAdminInfoDTO(adminRepository.save(AdminMapper.adminInfoDTOToAdmin(modifyDTO)));
+    }
+
+    @Transactional
+    public void deleteAdmin(String loginId, String password, PasswordEncoder passwordEncoder) {
+        Admin admin = adminRepository.findByLoginId(loginId).orElseThrow(() -> new DataNotExistsException("존재하지 않는 토큰입니다.", "Admin"));
+        if(passwordEncoder.matches(password, admin.getPassword())) {
+            adminRepository.deleteById(admin.getId());
+            authorityRepository.deleteById(loginId);
+        }
+        else {
+            throw new InvalidAccessException("잘못된 비밀번호입니다.");
+        }
     }
 }

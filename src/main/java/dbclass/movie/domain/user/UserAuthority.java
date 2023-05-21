@@ -8,7 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@IdClass(UserAuthorityId.class)
 @Builder
 public class UserAuthority {
 
@@ -16,18 +15,17 @@ public class UserAuthority {
     @Column(name = "login_id")
     private String loginId;
 
-    @Id
     @Column(name = "authority")
     private String authority;
 
     @Column(name = "PASSWORD", nullable = false)
     private String password;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "CUSTOMER_ID")
     private Customer customer;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "ADMIN_ID")
     private Admin admin;
 

@@ -3,16 +3,14 @@ package dbclass.movie.controller;
 import dbclass.movie.dto.user.AdminInfoDTO;
 import dbclass.movie.dto.user.LoginDTO;
 import dbclass.movie.security.JwtToken;
+import dbclass.movie.security.SecurityUtil;
 import dbclass.movie.service.AdminService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -50,5 +48,28 @@ public class AdminController {
         headers.set("Set-Cookie", responseCookie.toString());
 
         return new ResponseEntity<>(token.getAccessToken(), headers, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/modify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<AdminInfoDTO> adminModify(@ModelAttribute AdminInfoDTO modifyDTO) {
+        if(!(modifyDTO.getPassword() == null || modifyDTO.getPassword() == "")) {
+            modifyDTO.setPassword(passwordEncoder.encode(modifyDTO.getPassword()));
+        }
+        else {
+            modifyDTO.setPassword(null);
+        }
+
+        AdminInfoDTO dto = adminService.updateAdminData(modifyDTO, SecurityUtil.getCurrentUsername());
+
+        return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> adminDelete(@RequestBody String password) {
+        String loginId = SecurityUtil.getCurrentUsername();
+
+        adminService.deleteAdmin(loginId, password, passwordEncoder);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -4,10 +4,8 @@ import dbclass.movie.domain.user.Admin;
 import dbclass.movie.domain.user.Customer;
 import dbclass.movie.domain.user.Role;
 import dbclass.movie.domain.user.UserAuthority;
-import dbclass.movie.exceptionHandler.LoginFailureException;
-import dbclass.movie.repository.AdminRepository;
+import dbclass.movie.exceptionHandler.InvalidAccessException;
 import dbclass.movie.repository.AuthorityRepository;
-import dbclass.movie.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.GrantedAuthority;
@@ -28,12 +26,10 @@ import java.util.Collections;
 public class AuthorityService implements UserDetailsService {
 
     private final AuthorityRepository authorityRepository;
-    private final CustomerRepository customerRepository;
-    private final AdminRepository adminRepository;
 
     @Override
     public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
-        return authorityRepository.findByLoginId(loginId).map(this::createUserDetails).orElseThrow(() -> new RuntimeException("오류"));
+        return authorityRepository.findByLoginId(loginId).map(this::createUserDetails).orElseThrow(() -> new InvalidAccessException("오류"));
     }
     private UserDetails createUserDetails(UserAuthority authority) {
         GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(authority.getAuthority());
@@ -41,7 +37,7 @@ public class AuthorityService implements UserDetailsService {
         role.add(grantedAuthority);
 
         if(authority.getAuthority().equals(Role.ROLE_USER.getType())) {
-            Customer customer = customerRepository.findByLoginId(authority.getLoginId()).orElseThrow(() -> new LoginFailureException("존재하지 않는 아이디입니다."));
+            Customer customer = authority.getCustomer();
             return new User(
                     customer.getLoginId(),
                     customer.getPassword(),

@@ -34,20 +34,23 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/admin/signin",
             "/admin/signup",
-            "/"
+            "/api/**",
+            "/",
+            "/schedule/**",
+            "/ticket/**"
     };
     private static final String[] URL_ADMIN_ONLY = {
-            "/movie/rating/**",
-            "/movie/cast/**",
-            "/movie/{id}/role/**",
-            "/movie/genre/**",
             "/movie/**",
             "/theater/register",
             "/theater/{id}/seat/register",
             "/theater/modify",
             "/theater/{id}/seat/modify",
             "/theater/{id}/delete",
-            "/theater/{id}/seat/delete"
+            "/theater/{id}/seat/delete",
+            "/schedule/add",
+            "/schedule/{id}/modify",
+            "/schedule/{id}/delete",
+            "/schedule/previous"
     };
 
     @Bean
@@ -79,8 +82,8 @@ public class SecurityConfig {
 
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers(URL_TO_PERMIT).permitAll()
                 .requestMatchers(URL_ADMIN_ONLY).hasRole("ADMIN")
+                .requestMatchers(URL_TO_PERMIT).permitAll()
                 .anyRequest().authenticated();
 
         http
