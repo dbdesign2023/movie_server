@@ -11,6 +11,7 @@ import lombok.ToString;
 @ToString
 public class RoleAddDTO {
 
+    private Long roleId;
     private Long castId;
     private String role;
     private boolean starring;

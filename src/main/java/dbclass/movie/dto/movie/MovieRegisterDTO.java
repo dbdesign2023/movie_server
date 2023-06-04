@@ -23,6 +23,7 @@ public class MovieRegisterDTO {
     private String language;
     private MultipartFile poster;
     private Long directorId;
-    private int ratingId;
+    private String ratingCode;
     private List<RoleAddDTO> castRoles;
+    private List<GenreDTO> genres;
 }

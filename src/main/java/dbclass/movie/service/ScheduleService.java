@@ -4,10 +4,11 @@ import dbclass.movie.domain.movie.Movie;
 import dbclass.movie.domain.schedule.Schedule;
 import dbclass.movie.domain.theater.Theater;
 import dbclass.movie.dto.movie.MovieDTO;
-import dbclass.movie.dto.movie.MovieTitleDTO;
+import dbclass.movie.dto.movie.MovieTitleWithPosterRatingDTO;
 import dbclass.movie.dto.schedule.ScheduleAddDTO;
 import dbclass.movie.dto.schedule.ScheduleDTO;
 import dbclass.movie.exceptionHandler.DataNotExistsException;
+import dbclass.movie.exceptionHandler.DateErrorException;
 import dbclass.movie.mapper.MovieMapper;
 import dbclass.movie.mapper.ScheduleMapper;
 import dbclass.movie.repository.*;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,6 +41,17 @@ public class ScheduleService {
         Theater theater = (scheduleAddDTO.getTheaterId() != null) ? theaterRepository.findById(scheduleAddDTO.getTheaterId())
                 .orElseThrow((() -> new DataNotExistsException("존재하지 않는 상영관 ID입니다.", "Theater"))) : null;
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime startTimeOfRegister = LocalDateTime.parse(scheduleAddDTO.getStartTime(), formatter);
+        List<ScheduleDTO> scheduleOfDate = getScheduleSortByDate(startTimeOfRegister.toLocalDate());
+
+        //해당 시간에 해당 상영관에 영화 상영예정인 경우
+        if(scheduleOfDate.stream().filter(scheduleDTO -> scheduleDTO.getTheaterDTO().getTheaterId().equals(scheduleAddDTO.getTheaterId()))
+                        .anyMatch(scheduleDTO ->
+                            !(scheduleDTO.getStartTime().isAfter(startTimeOfRegister.plusMinutes(movie.getRunningTime()))
+                                    || scheduleDTO.getStartTime().plusMinutes(scheduleDTO.getMovieDTO().getRunningTime()).isBefore(startTimeOfRegister)))) {
+            throw new DateErrorException("해당 상영관에서 이미 상영 예정인 영화가 존재합니다. 다른 시간을 선택해주세요");
+        }
 
         scheduleRepository.save(ScheduleMapper.scheduleAddDTOToSchedule(scheduleAddDTO, theater, movie));
 
@@ -73,7 +86,7 @@ public class ScheduleService {
     @Transactional(readOnly = true)
     public List<ScheduleDTO> getScheduleSortByMovie(Long movieId) {
 
-        return getShowingSchedule().stream().map(schedule -> getLeftSeats(schedule)).collect(Collectors.toList());
+        return getShowingSchedule().stream().filter(schedule -> schedule.getMovie().getMovieId().equals(movieId)).map(schedule -> getLeftSeats(schedule)).collect(Collectors.toList());
     }
 
     private ScheduleDTO getLeftSeats(Schedule schedule) {
@@ -101,9 +114,9 @@ public class ScheduleService {
     }
 
     @Transactional(readOnly = true)
-    public List<MovieTitleDTO> getShowingMoviesOnlyTitle() {
+    public List<MovieTitleWithPosterRatingDTO> getShowingMoviesOnlyTitle() {
         List<Schedule> schedules = getShowingSchedule();
-        return schedules.stream().map(schedule -> schedule.getMovie()).distinct().map(movie -> MovieMapper.movieToMovieTitleDTO(movie)).collect(Collectors.toList());
+        return schedules.stream().map(schedule -> schedule.getMovie()).distinct().map(movie -> MovieMapper.movieToMovieTitleWithPosterRatingDTO(movie)).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)

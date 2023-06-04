@@ -8,6 +8,7 @@ import dbclass.movie.exceptionHandler.DataExistsException;
 import dbclass.movie.exceptionHandler.DataNotExistsException;
 import dbclass.movie.mapper.SeatMapper;
 import dbclass.movie.mapper.TheaterMapper;
+import dbclass.movie.repository.CodeRepository;
 import dbclass.movie.repository.SeatRepository;
 import dbclass.movie.repository.TheaterRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +16,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,13 +26,14 @@ public class TheaterService {
 
     private final TheaterRepository theaterRepository;
     private final SeatRepository seatRepository;
+    private final CodeRepository codeRepository;
 
     @Transactional
     public TheaterDTO register(TheaterRegisterDTO registerDTO) {
         if(theaterRepository.existsByName(registerDTO.getName())) {
             throw new DataExistsException("이미 존재하는 상영관입니다.", "theater");
         }
-        Theater theater = theaterRepository.save(TheaterMapper.theaterRegisterDTOToTheater(registerDTO));
+        Theater theater = theaterRepository.save(TheaterMapper.theaterRegisterDTOToTheater(registerDTO, codeRepository.findById(registerDTO.getType()).orElseThrow(() -> new DataNotExistsException("존재하지 않는 상영관 코드 타입 입니다.", "THEATER"))));
         return TheaterMapper.theaterToTheaterDTO(theater);
     }
 
@@ -49,6 +49,11 @@ public class TheaterService {
     public TheaterDTO getTheater(Long theaterId) {
         Theater theater = theaterRepository.findById(theaterId).orElseThrow(() -> new DataNotExistsException("존재하지 않는 상영관입니다.", "Theater"));
         return TheaterMapper.theaterToTheaterDTO(theater);
+    }
+
+    @Transactional(readOnly = true)
+    public List<TheaterDTO> getAllTheater() {
+        return theaterRepository.findAll().stream().map(theater -> TheaterMapper.theaterToTheaterDTO(theater)).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -70,7 +75,7 @@ public class TheaterService {
             throw new DataExistsException("이미 존재하는 상영관이름입니다.", "Theater");
         }
 
-        Theater theater = theaterRepository.save(TheaterMapper.theaterRegisterDTOToTheater(registerDTO));
+        Theater theater = theaterRepository.save(TheaterMapper.theaterRegisterDTOToTheater(registerDTO, codeRepository.findById(registerDTO.getType()).orElseThrow(() -> new DataNotExistsException("존재하지 않는 상영관 코드 타입 입니다.", "THEATER"))));
 
         return TheaterMapper.theaterToTheaterDTO(theater);
 

@@ -1,16 +1,23 @@
 package dbclass.movie.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-@MappedSuperclass
-@Getter
+@Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SuperBuilder
+@Builder
+@Table(name = "IMAGE")
 @AllArgsConstructor
-public abstract class Image {
+@ToString
+@Getter
+public class Image {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "poster_sequence")
+    @SequenceGenerator(name = "poster_sequence", sequenceName = "poster_sequence", allocationSize = 1)
+    @Column(name = "IMAGE_ID")
+    private Long imageId;
 
     @Column(name = "UUID", nullable = false)
     private String uuid;

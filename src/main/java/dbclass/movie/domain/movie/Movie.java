@@ -1,5 +1,7 @@
 package dbclass.movie.domain.movie;
 
+import dbclass.movie.domain.Code;
+import dbclass.movie.domain.Image;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -40,13 +42,13 @@ public class Movie {
 
     @OneToOne
     @JoinColumn(name = "POSTER", nullable = false)
-    private Poster poster;
+    private Image poster;
 
     @OneToOne
     @JoinColumn(name = "DIRECTOR", nullable = false)
     private Cast director;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "RATING", nullable = false)
-    private Rating rating;
+    private Code rating;
 }

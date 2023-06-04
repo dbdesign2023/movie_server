@@ -2,6 +2,7 @@ package dbclass.movie.mapper;
 
 import dbclass.movie.domain.user.Admin;
 import dbclass.movie.dto.user.AdminInfoDTO;
+import dbclass.movie.dto.user.AdminInfoDTOExcludePassword;
 
 public class AdminMapper {
 
@@ -17,6 +18,14 @@ public class AdminMapper {
 
     public static AdminInfoDTO adminToAdminInfoDTO(Admin admin) {
         return AdminInfoDTO.builder()
+                .loginId(admin.getLoginId())
+                .name(admin.getName())
+                .build();
+    }
+
+    public static AdminInfoDTOExcludePassword adminToAdminInfoDTOExcludePassword(Admin admin) {
+        return AdminInfoDTOExcludePassword.builder()
+                .adminId(admin.getAdminId())
                 .loginId(admin.getLoginId())
                 .name(admin.getName())
                 .build();

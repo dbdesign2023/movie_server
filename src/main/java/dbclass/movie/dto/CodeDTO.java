@@ -1,13 +1,13 @@
-package dbclass.movie.dto.movie;
+package dbclass.movie.dto;
 
 import lombok.*;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString
-public class RatingDTO {
+public class CodeDTO {
 
     private String code;
     private String name;

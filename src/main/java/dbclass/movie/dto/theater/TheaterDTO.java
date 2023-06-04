@@ -10,6 +10,7 @@ import lombok.*;
 public class TheaterDTO {
     private Long theaterId;
     private String name;
-    private String type;
+    private String typeCode;
+    private String typeName;
     private int floor;
 }

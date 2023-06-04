@@ -1,9 +1,7 @@
 package dbclass.movie.mapper;
 
-import dbclass.movie.domain.theater.Seat;
+import dbclass.movie.domain.Code;
 import dbclass.movie.domain.theater.Theater;
-import dbclass.movie.dto.theater.SeatDTO;
-import dbclass.movie.dto.theater.SeatRegisterDTO;
 import dbclass.movie.dto.theater.TheaterDTO;
 import dbclass.movie.dto.theater.TheaterRegisterDTO;
 
@@ -11,10 +9,10 @@ public class TheaterMapper {
 
     private TheaterMapper() {}
 
-    public static Theater theaterRegisterDTOToTheater(TheaterRegisterDTO theaterRegisterDTO) {
+    public static Theater theaterRegisterDTOToTheater(TheaterRegisterDTO theaterRegisterDTO, Code code) {
         return Theater.builder()
                 .theaterId(theaterRegisterDTO.getTheaterId())
-                .type(theaterRegisterDTO.getType())
+                .type(code)
                 .floor(theaterRegisterDTO.getFloor())
                 .name(theaterRegisterDTO.getName())
                 .build();
@@ -25,7 +23,8 @@ public class TheaterMapper {
                 .theaterId(theater.getTheaterId())
                 .floor(theater.getFloor())
                 .name(theater.getName())
-                .type(theater.getType())
+                .typeName(theater.getType().getName())
+                .typeCode(theater.getType().getCode())
                 .build();
     }
 

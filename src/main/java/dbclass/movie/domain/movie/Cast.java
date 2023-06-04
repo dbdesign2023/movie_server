@@ -3,17 +3,17 @@ package dbclass.movie.domain.movie;
 import dbclass.movie.domain.Image;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "CAST")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@SuperBuilder
-public class Cast extends Image {
+@Builder
+public class Cast {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cast_sequence")
@@ -32,5 +32,12 @@ public class Cast extends Image {
 
     @Column(name = "INFO", nullable = false)
     private String info;
+
+    @OneToMany(mappedBy = "cast", cascade = CascadeType.ALL)
+    private List<Role> roles;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PROFILE_IMAGE")
+    private Image profileImage;
 
 }

@@ -1,7 +1,8 @@
 package dbclass.movie.mapper;
 
+import dbclass.movie.domain.Code;
+import dbclass.movie.domain.Image;
 import dbclass.movie.domain.movie.*;
-import dbclass.movie.dto.ImageDTO;
 import dbclass.movie.dto.movie.*;
 
 import java.sql.Date;
@@ -10,7 +11,7 @@ public class MovieMapper {
 
     private MovieMapper() {}
 
-    public static Movie movieRegisterDTOToMovie(MovieRegisterDTO movieRegisterDTO, Poster poster, Cast cast, Rating rating) {
+    public static Movie movieRegisterDTOToMovie(MovieRegisterDTO movieRegisterDTO, Image poster, Cast cast, Code rating) {
         return Movie.builder()
                 .title(movieRegisterDTO.getTitle())
                 .releaseDate(Date.valueOf(movieRegisterDTO.getReleaseDate()))
@@ -33,38 +34,29 @@ public class MovieMapper {
                 .info(movie.getInfo())
                 .countryCode(movie.getCountryCode())
                 .language(movie.getLanguage())
-                .poster(posterToPosterDTO(movie.getPoster()))
+                .poster(imageToImageDTO(movie.getPoster()))
                 .director(castToCastInMovieDTO(movie.getDirector()))
-                .rating(ratingToRatingDTO(movie.getRating()))
+                .rating(movie.getRating().getName())
+                .minAge(Integer.parseInt(movie.getRating().getCode().substring(3)))
                 .build();
     }
 
-    public static RatingDTO ratingToRatingDTO(Rating rating) {
-        return RatingDTO.builder()
-                .ratingId(rating.getRatingId())
-                .name(rating.getName())
-                .minAge(rating.getMinAge())
-                .build();
-    }
-
-    public static Rating ratingDTOToRating(RatingDTO ratingDTO) {
-        return Rating.builder()
-                .ratingId(ratingDTO.getRatingId())
+    public static Code ratingDTOToCode(RatingDTO ratingDTO, Code upperCode) {
+        return Code.builder()
+                .code(ratingDTO.getCode())
                 .name(ratingDTO.getName())
-                .minAge(ratingDTO.getMinAge())
+                .upperCode(upperCode)
                 .build();
     }
 
-    public static Cast castInfoDTOWithImageToCast(CastInfoDTO castInfoDTO, ImageDTO profileImage) {
+    public static Cast castInfoDTOWithImageToCast(CastInfoDTO castInfoDTO, Image profileImage) {
         return Cast.builder()
                 .castId(castInfoDTO.getCastId())
                 .name(castInfoDTO.getName())
                 .birthDate(Date.valueOf(castInfoDTO.getBirthDate()))
                 .nationality(castInfoDTO.getNationality())
                 .info(castInfoDTO.getInfo())
-                .uuid(profileImage.getUuid())
-                .fileName(profileImage.getFileName())
-                .fileUrl(profileImage.getFileUrl())
+                .profileImage(profileImage)
                 .build();
     }
 
@@ -85,31 +77,50 @@ public class MovieMapper {
                 .build();
     }
 
-    public static GenreDTO genreToGenreDTO(Genre genre) {
-        return GenreDTO.builder()
-                .genreId(genre.getGenreId())
-                .name(genre.getName())
+    public static Code genreDTOToCode(GenreDTO genreDTO, Code upperCode) {
+        return Code.builder()
+                .code(genreDTO.getGenreId())
+                .name(genreDTO.getName())
+                .upperCode(upperCode)
                 .build();
     }
 
-    public static MovieTitleDTO movieToMovieTitleDTO(Movie movie) {
+    public static MovieTitleWithPosterRatingDTO movieToMovieTitleWithPosterRatingDTO(Movie movie) {
 
         String fileName = movie.getPoster().getUuid() + "_" + movie.getPoster().getFileName();
 
-        return MovieTitleDTO.builder()
+        return MovieTitleWithPosterRatingDTO.builder()
                 .title(movie.getTitle())
                 .movieId(movie.getMovieId())
-                .rating(ratingToRatingDTO(movie.getRating()))
+                .rating(movie.getRating().getName())
+                .minAge(Integer.parseInt(movie.getRating().getCode().substring(3)))
                 .fileName(fileName)
                 .build();
     }
 
-    private static PosterDTO posterToPosterDTO(Poster poster) {
-        return PosterDTO.builder()
-                .posterId(poster.getPosterId())
-                .uuid(poster.getUuid())
-                .fileName(poster.getFileName())
-                .fileUrl(poster.getFileUrl())
+    public static MovieTitleDTO movieToMovieTitleDTO(Movie movie) {
+        return MovieTitleDTO.builder()
+                .title(movie.getTitle())
+                .movieId(movie.getMovieId())
+                .build();
+    }
+
+    public static CastDTO castToCastDTO(Cast cast) {
+        return CastDTO.builder()
+                .castId(cast.getCastId())
+                .birthDate(cast.getBirthDate())
+                .info(cast.getInfo())
+                .nationality(cast.getNationality())
+                .profileImage(imageToImageDTO(cast.getProfileImage()))
+                .build();
+    }
+
+    private static ImageDTO imageToImageDTO(Image image) {
+        return ImageDTO.builder()
+                .imageId(image.getImageId())
+                .uuid(image.getUuid())
+                .fileName(image.getFileName())
+                .fileUrl(image.getFileUrl())
                 .build();
     }
 }

@@ -16,7 +16,5 @@ public class CastDTO {
     private Date birthDate;
     private String nationality;
     private String info;
-    private String uuid;
-    private String fileName;
-    private String fileUrl;
+    private ImageDTO profileImage;
 }

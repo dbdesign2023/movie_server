@@ -1,5 +1,6 @@
 package dbclass.movie.domain.theater;
 
+import dbclass.movie.domain.Code;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,8 +22,9 @@ public class Theater {
     @Column(name = "NAME",nullable = false)
     private String name;
 
-    @Column(name = "TYPE", nullable = false)
-    private String type;
+    @ManyToOne
+    @JoinColumn(name = "TYPE", nullable = false)
+    private Code type;
 
     @Column(name = "FLOOR", nullable = false)
     private int floor;
@@ -31,7 +33,7 @@ public class Theater {
     private List<Seat> seats = new ArrayList<>();
 
     @Builder
-    public Theater(Long theaterId, String name, String type, int floor) {
+    public Theater(Long theaterId, String name, Code type, int floor) {
         this.theaterId = theaterId;
         this.name = name;
         this.type = type;

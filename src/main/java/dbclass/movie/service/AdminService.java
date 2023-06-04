@@ -4,6 +4,7 @@ import dbclass.movie.domain.user.Admin;
 import dbclass.movie.domain.user.Role;
 import dbclass.movie.domain.user.UserAuthority;
 import dbclass.movie.dto.user.AdminInfoDTO;
+import dbclass.movie.dto.user.AdminInfoDTOExcludePassword;
 import dbclass.movie.dto.user.LoginDTO;
 import dbclass.movie.exceptionHandler.DataExistsException;
 import dbclass.movie.exceptionHandler.DataNotExistsException;
@@ -79,7 +80,10 @@ public class AdminService {
             modifyDTO.setPassword(admin.getPassword());
         }
 
-        return AdminMapper.adminToAdminInfoDTO(adminRepository.save(AdminMapper.adminInfoDTOToAdmin(modifyDTO)));
+        admin = AdminMapper.adminInfoDTOToAdmin(modifyDTO);
+        log.info(admin);
+        adminRepository.modifyAdmin(admin, loginId);
+        return adminRepository.findByLoginId(loginId).map(admin1 -> AdminMapper.adminToAdminInfoDTO(admin1)).orElseThrow(() -> new DataNotExistsException("존재하지 않는 회원입니다.", "ADMIN"));
     }
 
     @Transactional
@@ -92,5 +96,10 @@ public class AdminService {
         else {
             throw new InvalidAccessException("잘못된 비밀번호입니다.");
         }
+    }
+
+    @Transactional(readOnly = true)
+    public AdminInfoDTOExcludePassword getAdminDetail(String loginId) {
+        return adminRepository.findByLoginId(loginId).map(admin -> AdminMapper.adminToAdminInfoDTOExcludePassword(admin)).orElseThrow(() -> new DataNotExistsException("잘못된 토큰으로 접근했습니다.", "ADMIN"));
     }
 }

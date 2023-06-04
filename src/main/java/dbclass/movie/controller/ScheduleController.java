@@ -1,6 +1,6 @@
 package dbclass.movie.controller;
 
-import dbclass.movie.dto.movie.MovieTitleDTO;
+import dbclass.movie.dto.movie.MovieTitleWithPosterRatingDTO;
 import dbclass.movie.dto.schedule.ScheduleAddDTO;
 import dbclass.movie.dto.schedule.ScheduleDTO;
 import dbclass.movie.dto.schedule.SeatEmptyDTO;
@@ -48,7 +48,6 @@ public class ScheduleController {
         scheduleService.deleteSchedule(scheduleId);
     }
 
-    //상영일자에 따른 상영영화 조회
     @GetMapping("/date/{date}")
     public List<ScheduleDTO> getScheduleByDate(@PathVariable("date")String date) {
         LocalDate now = LocalDate.now();
@@ -66,7 +65,7 @@ public class ScheduleController {
     }
 
     @GetMapping("/allMovie")
-    public List<MovieTitleDTO> getAllShowingMoviesTitle() {
+    public List<MovieTitleWithPosterRatingDTO> getAllShowingMoviesTitle() {
         return scheduleService.getShowingMoviesOnlyTitle();
     }
 

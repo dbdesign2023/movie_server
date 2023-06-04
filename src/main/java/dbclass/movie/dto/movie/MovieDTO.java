@@ -18,7 +18,8 @@ public class MovieDTO {
     private String info;
     private String countryCode;
     private String language;
-    private PosterDTO poster;
+    private ImageDTO poster;
     private CastInMovieDTO director;
-    private RatingDTO rating;
+    private String rating;
+    private int minAge;
 }
