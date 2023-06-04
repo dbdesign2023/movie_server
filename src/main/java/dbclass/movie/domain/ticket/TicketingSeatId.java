@@ -10,6 +10,6 @@ import lombok.*;
 @AllArgsConstructor
 public class TicketingSeatId {
 
-    private Ticketing ticketing;
+    private Ticket ticket;
     private Seat seat;
 }

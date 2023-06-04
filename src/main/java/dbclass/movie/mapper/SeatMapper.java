@@ -2,8 +2,8 @@ package dbclass.movie.mapper;
 
 import dbclass.movie.domain.theater.Seat;
 import dbclass.movie.domain.theater.Theater;
-import dbclass.movie.domain.ticket.Ticketing;
-import dbclass.movie.domain.ticket.TicketingSeat;
+import dbclass.movie.domain.ticket.Ticket;
+import dbclass.movie.domain.ticket.TicketSeat;
 import dbclass.movie.dto.schedule.SeatEmptyDTO;
 import dbclass.movie.dto.theater.SeatDTO;
 import dbclass.movie.dto.theater.SeatRegisterDTO;
@@ -41,10 +41,11 @@ public class SeatMapper {
                 .build();
     }
 
-    public static TicketingSeat SeatToTicketingSeat(Ticketing ticket, Seat seat) {
-        return TicketingSeat.builder()
-                .ticketing(ticket)
+    public static TicketSeat SeatToTicketingSeat(Ticket ticket, Seat seat) {
+        return TicketSeat.builder()
+                .ticket(ticket)
                 .seat(seat)
                 .build();
     }
+
 }
