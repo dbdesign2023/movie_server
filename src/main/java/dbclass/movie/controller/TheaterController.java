@@ -61,4 +61,9 @@ public class TheaterController {
     public void deleteSeat(@PathVariable("id") Long theaterId, @RequestBody SeatDeleteDTO seatToDelete) {
         theaterService.deleteSeat(theaterId, seatToDelete);
     }
+
+    @GetMapping("/all")
+    public List<TheaterDTO> getAllTheaters() {
+        return theaterService.getAllTheater();
+    }
 }
