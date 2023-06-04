@@ -1,6 +1,7 @@
 package dbclass.movie.controller;
 
 import dbclass.movie.dto.user.AdminInfoDTO;
+import dbclass.movie.dto.user.AdminInfoDTOExcludePassword;
 import dbclass.movie.dto.user.LoginDTO;
 import dbclass.movie.security.JwtToken;
 import dbclass.movie.security.SecurityUtil;
@@ -50,6 +51,12 @@ public class AdminController {
         return new ResponseEntity<>(token.getAccessToken(), headers, HttpStatus.OK);
     }
 
+    @GetMapping("/detail")
+    public AdminInfoDTOExcludePassword getAdminInfo() {
+        String loginId = SecurityUtil.getCurrentUsername();
+        return adminService.getAdminDetail(loginId);
+    }
+
     @PostMapping(value = "/modify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<AdminInfoDTO> adminModify(@ModelAttribute AdminInfoDTO modifyDTO) {
         if(!(modifyDTO.getPassword() == null || modifyDTO.getPassword() == "")) {
@@ -58,7 +65,7 @@ public class AdminController {
         else {
             modifyDTO.setPassword(null);
         }
-
+        log.info(modifyDTO);
         AdminInfoDTO dto = adminService.updateAdminData(modifyDTO, SecurityUtil.getCurrentUsername());
 
         return new ResponseEntity<>(dto, HttpStatus.OK);
