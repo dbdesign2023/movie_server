@@ -37,7 +37,8 @@ public class SecurityConfig {
             "/api/**",
             "/",
             "/schedule/**",
-            "/ticket/**"
+            "/ticket/**",
+            "/theater/all"
     };
     private static final String[] URL_ADMIN_ONLY = {
             "/movie/**",
@@ -50,7 +51,9 @@ public class SecurityConfig {
             "/schedule/add",
             "/schedule/{id}/modify",
             "/schedule/{id}/delete",
-            "/schedule/previous"
+            "/schedule/previous",
+            "/admin/modify",
+            "/admin/delete"
     };
 
     @Bean
