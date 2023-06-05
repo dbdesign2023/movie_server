@@ -1,6 +1,5 @@
 package dbclass.movie.dto.schedule;
 
-import dbclass.movie.dto.movie.MovieDTO;
 import dbclass.movie.dto.theater.TheaterDTO;
 import lombok.*;
 
@@ -16,7 +15,7 @@ public class ScheduleDTO {
     private Long scheduleId;
     private LocalDateTime startTime;
     private String discount;
-    private MovieDTO movieDTO;
+    private Long movieId;
     private TheaterDTO theaterDTO;
     private int totalSeat;
     private int filledSeat;

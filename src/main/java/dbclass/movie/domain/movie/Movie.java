@@ -5,7 +5,9 @@ import dbclass.movie.domain.Image;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.sql.Date;
+import java.util.List;
 
 
 @Entity
@@ -51,4 +53,8 @@ public class Movie {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "RATING", nullable = false)
     private Code rating;
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    private List<Role> roles;
+
 }

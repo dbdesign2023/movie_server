@@ -38,10 +38,14 @@ public class SecurityConfig {
             "/",
             "/schedule/**",
             "/ticket/**",
-            "/theater/all"
+            "/theater/all",
+            "/movie/**"
     };
     private static final String[] URL_ADMIN_ONLY = {
-            "/movie/**",
+            "/movie/register",
+            "/movie/genre/add",
+            "/movie/genre/delete",
+            "/movie/genre/modify",
             "/theater/register",
             "/theater/{id}/seat/register",
             "/theater/modify",

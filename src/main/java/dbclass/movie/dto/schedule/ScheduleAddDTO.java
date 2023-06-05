@@ -15,6 +15,6 @@ public class ScheduleAddDTO {
     private Long theaterId;
     @Pattern(regexp = "\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) (0[1-9]|1[0-9]|2[0-4]):(0[1-9]|[1-5][0-9])", message = "형식은 yyyy-MM-dd HH:mm 입니다.")
     private String startTime;
-    @Pattern(regexp = "\\d{1,3}%|\\d+\\w{3}")
+    @Pattern(regexp = "\\d{1,3}%|\\d+\\\\")
     private String discount;
 }

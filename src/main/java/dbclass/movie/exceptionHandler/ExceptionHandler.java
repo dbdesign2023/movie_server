@@ -1,8 +1,11 @@
 package dbclass.movie.exceptionHandler;
 
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
@@ -100,6 +103,33 @@ public class ExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .message(exception.getMessage())
                 .errorCode("INVALID_DATE")
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(InvalidDataException.class)
+    public ResponseEntity<ErrorResponse> validationError(InvalidDataException exception) {
+        log.warn("validation failed in entity: " + exception.getMessage());
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .message(exception.getMessage())
+                .errorCode("INVALID_INPUT")
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> validationError(MethodArgumentNotValidException exception) {
+        log.warn("validation failed in entity: " + exception.getMessage());
+
+        String errorMessage = exception.getBindingResult().getAllErrors().stream().filter(error -> error instanceof FieldError).map(error -> (FieldError) error).map(FieldError::getDefaultMessage).findFirst().orElse(null);
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .message(errorMessage)
+                .errorCode("INVALID_INPUT")
                 .build();
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);

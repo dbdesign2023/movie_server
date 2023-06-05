@@ -24,6 +24,5 @@ public class MovieRegisterDTO {
     private MultipartFile poster;
     private Long directorId;
     private String ratingCode;
-    private List<RoleAddDTO> castRoles;
-    private List<GenreDTO> genres;
+    private List<String> genreCodes;
 }

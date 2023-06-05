@@ -25,21 +25,23 @@ public class TicketController {
 
     //티켓 예매
     @PostMapping("/reservation")
-    public ResponseEntity<String> reserveTicket(@RequestBody TicketReserveDTO ticketReserveDTO) {
-        if(ticketReserveDTO.getLoginId() != null) {
-            if(!SecurityUtil.getCurrentUsername().equals(ticketReserveDTO.getLoginId())) {
-                throw new InvalidAccessException("잘못된 로그인 정보로 진행중입니다.");
-            }
-        }
-        else {
-            if(ticketReserveDTO.getPassword() == null || ticketReserveDTO.getPhoneNo() == null) {
-                throw new InvalidAccessException("비회원은 휴대전화 번호와 비밀번호를 입력해야만 예매할 수 있습니다.");
-            }
+    public ResponseEntity<TicketDetailCustomerDTO> reserveTicket(@RequestBody TicketReserveDTO ticketReserveDTO) {
+
+        String loginId = SecurityUtil.getCurrentUsername();
+
+        //비회원의 경우
+        if(loginId == null && (ticketReserveDTO.getPassword() == null || ticketReserveDTO.getPhoneNo() == null)) {
+            throw new InvalidAccessException("비회원은 휴대전화 번호와 비밀번호를 입력해야만 예매할 수 있습니다.");
         }
 
-        ticketService.saveTicket(ticketReserveDTO);
+        //회원의 경우
+        else if(!(loginId == null) && !(ticketReserveDTO.getPassword() == null && ticketReserveDTO.getPhoneNo() == null)) {
+            throw new InvalidAccessException("잘못된 접근입니다. 로그인한 고객은 휴대전화 번호와 비밀번호를 줄 수 없습니다.");
+        }
 
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        TicketDetailCustomerDTO ticketDTO = ticketService.saveTicket(ticketReserveDTO, loginId);
+
+        return new ResponseEntity<>(ticketDTO, HttpStatus.CREATED);
     }
 
     //고객이 티켓 예매 목록 확인
@@ -53,9 +55,6 @@ public class TicketController {
     @PostMapping("/modify/member")
     public void modifyTicket(@RequestParam("ticketId") Long ticketId, @RequestBody TicketReserveDTO ticketReserveDTO) {
         String loginId = SecurityUtil.getCurrentUsername();
-        if(!ticketReserveDTO.getLoginId().equals(loginId)) {
-            throw new InvalidAccessException("잘못된 고객 접근입니다.");
-        }
 
         CustomerTicketDTO customerTicketDTO = ticketService.getTicket(ticketId);
         if(!customerTicketDTO.getScheduleId().equals(ticketReserveDTO.getScheduleId())) {
@@ -63,6 +62,9 @@ public class TicketController {
         }
         if(customerTicketDTO.isPayed()) {
             throw new InvalidAccessException("이미 결제된 티켓은 수정불가합니다. 취소 후 다시 진행해주세요.");
+        }
+        if(!customerTicketDTO.getLoginId().equals(loginId)) {
+            throw new InvalidAccessException("로그인된 회원의 티켓이 아닙니다.");
         }
 
         ticketService.modifyTicket(ticketReserveDTO, ticketId);

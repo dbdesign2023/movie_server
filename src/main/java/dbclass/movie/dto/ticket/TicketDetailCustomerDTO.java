@@ -23,4 +23,5 @@ public class TicketDetailCustomerDTO {
     private int runningTime;
     private String posterFileName;
     private List<SeatDTO> seats;
+    private String discount;
 }

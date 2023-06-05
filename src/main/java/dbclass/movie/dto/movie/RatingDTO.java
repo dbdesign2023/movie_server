@@ -1,5 +1,6 @@
 package dbclass.movie.dto.movie;
 
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Data
@@ -9,6 +10,8 @@ import lombok.*;
 @ToString
 public class RatingDTO {
 
+    @Size(max = 5)
     private String code;
+
     private String name;
 }

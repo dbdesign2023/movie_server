@@ -12,7 +12,10 @@ public interface CodeRepository extends JpaRepository<Code, String> {
     Code findGenreUpperCode();
 
     @Query("select c from Code c where c.code = 'RT0'")
-    Code findRatingUppderCode();
+    Code findRatingUpperCode();
+
+    @Query("select c from Code c where c.code = 'PM0'")
+    Code findPaymentMethodUpperCode();
 
     List<Code> findAllByUpperCode(Code code);
 

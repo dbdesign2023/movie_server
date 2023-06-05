@@ -3,6 +3,7 @@ package dbclass.movie.dto.movie;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -21,5 +22,5 @@ public class MovieDTO {
     private ImageDTO poster;
     private CastInMovieDTO director;
     private String rating;
-    private int minAge;
+    private List<String> genreList;
 }

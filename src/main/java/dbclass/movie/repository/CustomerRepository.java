@@ -30,4 +30,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     @Modifying
     @Query("update Customer c set c.password = :password where c.loginId = :id")
     void updatePassword(@Param("password") String password, @Param("id") String loginId);
+
+    @Modifying
+    @Query("update Customer c set c.point = :point where c.customerId = :customerId")
+    void updatePoint(@Param("point") int point, @Param("customerId") Long customerId);
 }

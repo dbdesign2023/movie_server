@@ -32,7 +32,7 @@ public class ScheduleMapper {
                 .theaterDTO(TheaterMapper.theaterToTheaterDTO(schedule.getTheater()))
                 .startTime(schedule.getStartTime().toLocalDateTime())
                 .discount(schedule.getDiscount())
-                .movieDTO(MovieMapper.movieToMovieDTO(schedule.getMovie()))
+                .movieId(schedule.getMovie().getMovieId())
                 .build();
     }
 }

@@ -7,6 +7,7 @@ import dbclass.movie.security.JwtToken;
 import dbclass.movie.security.SecurityUtil;
 import dbclass.movie.service.CustomerService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.*;
@@ -25,7 +26,7 @@ public class CustomerController {
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> customerSignup(@ModelAttribute CustomerInfoDTO signupDTO) {
+    public ResponseEntity<String> customerSignup(@Valid @ModelAttribute CustomerInfoDTO signupDTO) {
         log.debug("signup request: " + signupDTO);
         signupDTO.setPassword(passwordEncoder.encode(signupDTO.getPassword()));
         customerService.signup(signupDTO);
@@ -60,7 +61,7 @@ public class CustomerController {
     }
 
     @PostMapping(value = "/modify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> customerModify(@ModelAttribute CustomerInfoDTO modifyDTO) {
+    public ResponseEntity<String> customerModify(@Valid @ModelAttribute CustomerInfoDTO modifyDTO) {
         log.debug("modify customer data: " + modifyDTO);
 
         if(!(modifyDTO.getPassword() == null || modifyDTO.getPassword() == "")) {

@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 public class TicketService {
 
     private final TicketRepository ticketRepository;
-    private final TicketingSeatRepository ticketingSeatRepository;
+    private final TicketSeatRepository ticketSeatRepository;
     private final SeatRepository seatRepository;
     private final ScheduleRepository scheduleRepository;
     private final CustomerRepository customerRepository;
@@ -38,7 +38,7 @@ public class TicketService {
 
     public List<SeatEmptyDTO> getTicketedSeats(Long scheduleId, List<SeatDTO> originalSeats) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> new DataNotExistsException("존재하지 않는 상영ID입니다.", "SCHEDULE"));
-        List<String> ticketSeatsId = ticketingSeatRepository.findSeatIdBySchedule(schedule);
+        List<String> ticketSeatsId = ticketSeatRepository.findSeatIdBySchedule(schedule);
 
         List<SeatEmptyDTO> emptySeats = new ArrayList<>();
 
@@ -59,24 +59,17 @@ public class TicketService {
     }
 
     @Transactional
-    public void saveTicket(TicketReserveDTO ticketReserveDTO) {
+    public TicketDetailCustomerDTO saveTicket(TicketReserveDTO ticketReserveDTO, String loginId) {
         Schedule schedule = scheduleRepository.findById(ticketReserveDTO.getScheduleId()).orElseThrow(()-> new DataNotExistsException("존재하지 않는 상영일정 ID입니다.","SCHEDULE"));
         Customer customer = null;
-        String password = null;
-        String phoneNo = null;
-        if(!(ticketReserveDTO.getLoginId() == null)) {
-            customer = customerRepository.findByLoginId(ticketReserveDTO.getLoginId()).orElseThrow(() -> new DataNotExistsException("존재하지 않는 사용자ID입니다.", "USER"));
-        }
-
-        else {
-            password = ticketReserveDTO.getPassword();
-            phoneNo = ticketReserveDTO.getPhoneNo();
+        if(!(loginId == null)) {
+            customer = customerRepository.findByLoginId(loginId).orElseThrow(() -> new DataNotExistsException("존재하지 않는 사용자ID입니다.", "USER"));
         }
 
         Ticket ticket = TicketMapper.TicketReserveDTOToTicket(ticketReserveDTO, customer, schedule);
 
         ticket = ticketRepository.save(ticket);
-        List<String> ticketSeatsId = ticketingSeatRepository.findSeatIdBySchedule(schedule);
+        List<String> ticketSeatsId = ticketSeatRepository.findSeatIdBySchedule(schedule);
 
         ticketReserveDTO.getSeats().forEach(seatId -> {
             if(ticketSeatsId.contains(seatId)) throw new DataExistsException("이미 예약된 좌석입니다.", "SEAT" + seatId);
@@ -90,7 +83,12 @@ public class TicketService {
                 return SeatMapper.SeatToTicketingSeat(currentTicket, seat);
         }).collect(Collectors.toList());
 
-        ticketingSeatRepository.saveAll(seatsToRegister);
+        ticketSeatRepository.saveAll(seatsToRegister);
+
+        TicketDetailCustomerDTO ticketDTO =  TicketMapper.ticketToTicketDetailCustomerDTO(currentTicket);
+        ticketDTO.setSeats(ticketSeatRepository.findAllByTicketId(currentTicket.getTicketId()).stream().map(ticketSeat -> SeatMapper.seatToSeatDTO(ticketSeat.getSeat())).collect(Collectors.toList()));
+
+        return ticketDTO;
     }
 
     @Transactional(readOnly = true)
@@ -111,19 +109,18 @@ public class TicketService {
     @Transactional(readOnly = true)
     public CustomerTicketDTO getTicket(Long ticketId) {
         Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new DataNotExistsException("존재하지 않는 티켓ID입니다.", "TICKET"));
-        //결제 여부 체크하기
 
-        return TicketMapper.ticketToTicketDTO(ticket);
+        return TicketMapper.ticketToTicketDTO(ticket, ticket.getPayment().isStatus());
     }
 
     @Transactional
     public void modifyTicket(TicketReserveDTO ticketReserveDTO, Long ticketId) {
         Ticket ticket = ticketRepository.findById(ticketId).get();
 
-        List<TicketSeat> seats = ticketingSeatRepository.findSeatBySchedule(ticket.getSchedule());
+        List<TicketSeat> seats = ticketSeatRepository.findSeatBySchedule(ticket.getSchedule());
 
         seats = seats.stream().filter(ticketSeat -> ticketSeat.getTicket().equals(ticket)).collect(Collectors.toList());
-        seats.stream().forEach(ticketSeat -> ticketingSeatRepository.delete(ticketSeat));
+        seats.stream().forEach(ticketSeat -> ticketSeatRepository.delete(ticketSeat));
 
         List<String> ticketSeatId = seats.stream().map(ticketSeat -> ticketSeat.getSeat().getSeatId()).collect(Collectors.toList());
         ticketReserveDTO.getSeats().forEach(seatId -> {
@@ -138,7 +135,7 @@ public class TicketService {
             return SeatMapper.SeatToTicketingSeat(ticket, seat);
         }).collect(Collectors.toList());
 
-        ticketingSeatRepository.saveAll(seatsToRegister);
+        ticketSeatRepository.saveAll(seatsToRegister);
     }
 
     @Transactional
@@ -154,9 +151,9 @@ public class TicketService {
             ticketRepository.save(ticket);
         }
 
-        List<TicketSeat> seats = ticketingSeatRepository.findSeatBySchedule(ticket.getSchedule());
+        List<TicketSeat> seats = ticketSeatRepository.findSeatBySchedule(ticket.getSchedule());
         seats = seats.stream().filter(ticketSeat -> ticketSeat.getTicket().equals(ticket)).collect(Collectors.toList());
-        seats.stream().forEach(ticketSeat -> ticketingSeatRepository.delete(ticketSeat));
+        seats.stream().forEach(ticketSeat -> ticketSeatRepository.delete(ticketSeat));
 
         List<String> ticketSeatId = seats.stream().map(ticketSeat -> ticketSeat.getSeat().getSeatId()).collect(Collectors.toList());
         modifyDTO.getSeats().forEach(seatId -> {
@@ -171,7 +168,7 @@ public class TicketService {
             return SeatMapper.SeatToTicketingSeat(ticket, seat);
         }).collect(Collectors.toList());
 
-        ticketingSeatRepository.saveAll(seatsToRegister);
+        ticketSeatRepository.saveAll(seatsToRegister);
     }
 
     @Transactional(readOnly = true)
@@ -179,7 +176,7 @@ public class TicketService {
         Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new DataNotExistsException("존재하지 않는 티켓 ID입니다.", "TICKET"));
 
         TicketDetailCustomerDTO ticketDTO = TicketMapper.ticketToTicketDetailCustomerDTO(ticket);
-        ticketDTO.setSeats(ticketingSeatRepository.findAllByTicketId(ticketId).stream().map(ticketSeat -> SeatMapper.seatToSeatDTO(ticketSeat.getSeat())).collect(Collectors.toList()));
+        ticketDTO.setSeats(ticketSeatRepository.findAllByTicketId(ticketId).stream().map(ticketSeat -> SeatMapper.seatToSeatDTO(ticketSeat.getSeat())).collect(Collectors.toList()));
 
         return ticketDTO;
     }
@@ -200,7 +197,7 @@ public class TicketService {
         }
 
         TicketDetailCustomerDTO ticketDTO = TicketMapper.ticketToTicketDetailCustomerDTO(ticket);
-        ticketDTO.setSeats(ticketingSeatRepository.findAllByTicketId(ticketId).stream().map(ticketSeat -> SeatMapper.seatToSeatDTO(ticketSeat.getSeat())).collect(Collectors.toList()));
+        ticketDTO.setSeats(ticketSeatRepository.findAllByTicketId(ticketId).stream().map(ticketSeat -> SeatMapper.seatToSeatDTO(ticketSeat.getSeat())).collect(Collectors.toList()));
 
         return ticketDTO;
     }

@@ -33,12 +33,13 @@ public class TicketMapper {
                 .build();
     }
 
-    public static CustomerTicketDTO ticketToTicketDTO(Ticket ticket) {
+    public static CustomerTicketDTO ticketToTicketDTO(Ticket ticket, boolean isPayed) {
         return CustomerTicketDTO.builder()
                 .ticketId(ticket.getTicketId())
                 .ticketTime(ticket.getTicketTime())
                 .loginId(ticket.getCustomer().getLoginId())
                 .scheduleId(ticket.getSchedule().getScheduleId())
+                .isPayed(isPayed)
                 .build();
     }
 
@@ -56,6 +57,7 @@ public class TicketMapper {
                 .startTime(ticket.getSchedule().getStartTime())
                 .runningTime(ticket.getSchedule().getMovie().getRunningTime())
                 .posterFileName(ticket.getSchedule().getMovie().getPoster().getFileName())
+                .discount(ticket.getSchedule().getDiscount())
                 .build();
     }
 }

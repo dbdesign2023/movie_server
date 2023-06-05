@@ -3,9 +3,11 @@ package dbclass.movie.controller;
 import dbclass.movie.domain.Code;
 import dbclass.movie.dto.CodeDTO;
 import dbclass.movie.dto.movie.*;
+import dbclass.movie.exceptionHandler.InvalidAccessException;
 import dbclass.movie.service.MovieService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
@@ -28,7 +30,7 @@ public class MovieController {
         return movieService.register(movieRegisterDTO);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/detail")
     public MovieDTO getMovieDetail(@RequestParam("id") Long movieId) {
         return movieService.getMovie(movieId);
     }
@@ -39,9 +41,17 @@ public class MovieController {
         return movieService.getShortMovieList();
     }
 
+    @DeleteMapping("/delete")
+    public void deleteMovie(@RequestParam("id") Long movieId) {
+        movieService.deleteMovie(movieId);
+    }
+
     //장르 관련
     @PostMapping(value = "/genre/add")
-    public List<Code> addGenre(@RequestBody CodeDTO codeDTO) {
+    public List<Code> addGenre(@Valid @RequestBody CodeDTO codeDTO) {
+        if(codeDTO.getCode() == null || codeDTO.getName() == null) {
+            throw new InvalidAccessException("데이터가 비어있습니다.");
+        }
         return movieService.addGenre(codeDTO.getName(), codeDTO.getCode());
     }
 
@@ -58,20 +68,29 @@ public class MovieController {
 //        return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
     }
 
-    @PostMapping(value = "/genre/modify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public void modifyGenre(@RequestBody CodeDTO codeDTO) {
+    @PostMapping(value = "/genre/modify")
+    public void modifyGenre(@Valid @RequestBody CodeDTO codeDTO) {
+        if(codeDTO.getCode() == null || codeDTO.getName() == null) {
+            throw new InvalidAccessException("데이터가 비어있습니다.");
+        }
         movieService.modifyGenre(codeDTO.getName(), codeDTO.getCode());
     }
 
 
     //등급관련
-    @PostMapping(value = "/rating/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public List<Code> registerRating(@ModelAttribute RatingDTO ratingDTO) {
-        return movieService.updateRating(ratingDTO);
+    @PostMapping(value = "/rating/add")
+    public List<Code> registerRating(@Valid @RequestBody RatingDTO ratingDTO) {
+        if(ratingDTO.getCode() == null || ratingDTO.getName() == null) {
+            throw new InvalidAccessException("데이터가 비어있습니다.");
+        }
+        return movieService.addRating(ratingDTO);
     }
 
-    @PostMapping(value = "/rating/modify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public List<Code> modifyRating(@ModelAttribute RatingDTO ratingDTO) {
+    @PostMapping(value = "/rating/modify")
+    public List<Code> modifyRating(@Valid @RequestBody RatingDTO ratingDTO) {
+        if(ratingDTO.getCode() == null || ratingDTO.getName() == null) {
+            throw new InvalidAccessException("데이터가 비어있습니다.");
+        }
         return movieService.updateRating(ratingDTO);
     }
 
@@ -89,6 +108,7 @@ public class MovieController {
     //인물 관련
     @PostMapping(value = "/cast/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public List<CastInMovieDTO> registerCast(@ModelAttribute CastInfoDTO infoDTO) {
+        log.info(infoDTO);
         return movieService.addCast(infoDTO);
     }
 
@@ -98,8 +118,8 @@ public class MovieController {
         return movieService.getCast(castId);
     }
 
-    @PostMapping(value = "/cast/modify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public List<CastInMovieDTO> modifyCast(@ModelAttribute CastInfoDTO infoDTO) {
+    @PostMapping(value = "/cast/modify")
+    public List<CastInMovieDTO> modifyCast(@RequestBody CastInfoDTO infoDTO) {
         return movieService.modifyCast(infoDTO);
     }
 
@@ -115,13 +135,13 @@ public class MovieController {
 
 
     //역할 관련
-    @PostMapping(value = "/{movieId}/role/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public void addRole(@PathVariable("movieId") Long movieId, @ModelAttribute RoleAddDTO rolesToAddDTO) {
+    @PostMapping(value = "/{movieId}/role/add")
+    public void addRole(@PathVariable("movieId") Long movieId, @RequestBody RoleAddDTO rolesToAddDTO) {
         movieService.addRole(movieId, rolesToAddDTO);
     }
 
-    @PostMapping(value = "/{movieId}/role/modify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public void modifyRole(@PathVariable("movieId") Long movieId, @ModelAttribute RoleAddDTO roleAddDTO) {
+    @PostMapping(value = "/{movieId}/role/modify")
+    public void modifyRole(@PathVariable("movieId") Long movieId, @RequestBody RoleAddDTO roleAddDTO) {
         movieService.addRole(movieId, roleAddDTO);
     }
 

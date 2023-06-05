@@ -32,8 +32,9 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final MovieRepository movieRepository;
     private final TheaterRepository theaterRepository;
-    private final TicketingSeatRepository ticketingSeatRepository;
+    private final TicketSeatRepository ticketSeatRepository;
     private final SeatRepository seatRepository;
+    private final GenreRegisterRepository genreRegisterRepository;
 
     @Transactional
     public List<ScheduleDTO> updateSchedule(ScheduleAddDTO scheduleAddDTO) {
@@ -49,7 +50,7 @@ public class ScheduleService {
         if(scheduleOfDate.stream().filter(scheduleDTO -> scheduleDTO.getTheaterDTO().getTheaterId().equals(scheduleAddDTO.getTheaterId()))
                         .anyMatch(scheduleDTO ->
                             !(scheduleDTO.getStartTime().isAfter(startTimeOfRegister.plusMinutes(movie.getRunningTime()))
-                                    || scheduleDTO.getStartTime().plusMinutes(scheduleDTO.getMovieDTO().getRunningTime()).isBefore(startTimeOfRegister)))) {
+                                    || scheduleDTO.getStartTime().plusMinutes(movieRepository.findById(scheduleDTO.getMovieId()).orElseThrow(() -> new DataNotExistsException("존재하지 않는 영화입니다.", "Movie")).getRunningTime()).isBefore(startTimeOfRegister)))) {
             throw new DateErrorException("해당 상영관에서 이미 상영 예정인 영화가 존재합니다. 다른 시간을 선택해주세요");
         }
 
@@ -91,7 +92,7 @@ public class ScheduleService {
 
     private ScheduleDTO getLeftSeats(Schedule schedule) {
         ScheduleDTO scheduleDTO = ScheduleMapper.scheduleToScheduleDTO(schedule);
-        scheduleDTO.setFilledSeat(ticketingSeatRepository.countFilledSeatBySchedule(schedule));
+        scheduleDTO.setFilledSeat(ticketSeatRepository.countFilledSeatBySchedule(schedule));
         scheduleDTO.setTotalSeat(seatRepository.countSeatByTheater(schedule.getTheater()));
 
         return scheduleDTO;
@@ -122,7 +123,7 @@ public class ScheduleService {
     @Transactional(readOnly = true)
     public List<MovieDTO> getShowingMovies() {
         List<Schedule> schedules = getShowingSchedule();
-        return schedules.stream().map(schedule -> schedule.getMovie()).distinct().map(movie -> MovieMapper.movieToMovieDTO(movie)).collect(Collectors.toList());
+        return schedules.stream().map(schedule -> schedule.getMovie()).distinct().map(movie -> MovieMapper.movieToMovieDTO(movie, genreRegisterRepository.findAllByMovie(movie).stream().map(genreRegister -> genreRegister.getGenre().getName()).collect(Collectors.toList()))).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)

@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface TicketingSeatRepository extends JpaRepository<TicketSeat, TicketingSeatId> {
+public interface TicketSeatRepository extends JpaRepository<TicketSeat, TicketingSeatId> {
 
     @Query("select ts.seat.seatId from TicketSeat ts inner join ts.ticket tk where tk.schedule = :schedule")
     List<String> findSeatIdBySchedule(Schedule schedule);

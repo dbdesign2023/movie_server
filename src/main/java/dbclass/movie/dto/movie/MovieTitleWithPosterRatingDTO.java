@@ -13,5 +13,4 @@ public class MovieTitleWithPosterRatingDTO {
     private String title;
     private String fileName;
     private String rating;
-    private int minAge;
 }

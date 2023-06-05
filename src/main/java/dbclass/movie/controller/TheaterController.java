@@ -19,7 +19,7 @@ public class TheaterController {
     private final TheaterService theaterService;
 
     @PostMapping("/register")
-    public TheaterDTO registerTheater(@ModelAttribute TheaterRegisterDTO registerDTO) {
+    public TheaterDTO registerTheater(@RequestBody TheaterRegisterDTO registerDTO) {
         return theaterService.register(registerDTO);
     }
 
@@ -41,7 +41,7 @@ public class TheaterController {
 
     //상영관 수정
     @PostMapping("/modify")
-    public TheaterDTO modifyTheater(@ModelAttribute TheaterRegisterDTO registerDTO) {
+    public TheaterDTO modifyTheater(@RequestBody TheaterRegisterDTO registerDTO) {
         return theaterService.modifyTheater(registerDTO);
     }
 

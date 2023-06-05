@@ -6,6 +6,8 @@ import dbclass.movie.domain.movie.*;
 import dbclass.movie.dto.movie.*;
 
 import java.sql.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class MovieMapper {
 
@@ -25,7 +27,7 @@ public class MovieMapper {
                 .build();
     }
 
-    public static MovieDTO movieToMovieDTO(Movie movie) {
+    public static MovieDTO movieToMovieDTO(Movie movie, List<String> genreList) {
         return MovieDTO.builder()
                 .movieId(movie.getMovieId())
                 .title(movie.getTitle())
@@ -37,7 +39,7 @@ public class MovieMapper {
                 .poster(imageToImageDTO(movie.getPoster()))
                 .director(castToCastInMovieDTO(movie.getDirector()))
                 .rating(movie.getRating().getName())
-                .minAge(Integer.parseInt(movie.getRating().getCode().substring(3)))
+                .genreList(genreList)
                 .build();
     }
 
@@ -93,7 +95,6 @@ public class MovieMapper {
                 .title(movie.getTitle())
                 .movieId(movie.getMovieId())
                 .rating(movie.getRating().getName())
-                .minAge(Integer.parseInt(movie.getRating().getCode().substring(3)))
                 .fileName(fileName)
                 .build();
     }

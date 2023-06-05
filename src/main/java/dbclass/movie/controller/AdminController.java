@@ -7,6 +7,7 @@ import dbclass.movie.security.JwtToken;
 import dbclass.movie.security.SecurityUtil;
 import dbclass.movie.service.AdminService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.*;
@@ -23,16 +24,16 @@ public class AdminController {
     private final AdminService adminService;
     private final PasswordEncoder passwordEncoder;
 
-    @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> adminSignup(@ModelAttribute AdminInfoDTO signupDTO) {
+    @PostMapping(value = "/signup")
+    public ResponseEntity<String> adminSignup(@Valid @RequestBody AdminInfoDTO signupDTO) {
         log.info("admin signup request: " + signupDTO);
         signupDTO.setPassword(passwordEncoder.encode(signupDTO.getPassword()));
         adminService.signup(signupDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping(value = "/signin", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> adminSignIn(@ModelAttribute LoginDTO loginDTO) {
+    @PostMapping(value = "/signin")
+    public ResponseEntity<String> adminSignIn(@RequestBody LoginDTO loginDTO) {
         log.debug("admin signIn request: " + loginDTO);
         JwtToken token = adminService.signIn(loginDTO);
 
@@ -57,8 +58,8 @@ public class AdminController {
         return adminService.getAdminDetail(loginId);
     }
 
-    @PostMapping(value = "/modify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<AdminInfoDTO> adminModify(@ModelAttribute AdminInfoDTO modifyDTO) {
+    @PostMapping(value = "/modify")
+    public ResponseEntity<AdminInfoDTO> adminModify(@Valid @RequestBody AdminInfoDTO modifyDTO) {
         if(!(modifyDTO.getPassword() == null || modifyDTO.getPassword() == "")) {
             modifyDTO.setPassword(passwordEncoder.encode(modifyDTO.getPassword()));
         }
