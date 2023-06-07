@@ -28,36 +28,27 @@ public class SecurityConfig {
     private final CorsConfig corsConfig;
 
     private static final String[] URL_TO_PERMIT = {
-            "/customer/signup",
-            "/customer/signin",
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/admin/signin",
-            "/admin/signup",
-            "/api/**",
-            "/",
-            "/schedule/**",
-            "/ticket/**",
-            "/theater/all",
-            "/movie/**"
+            "/v3/api-docs/**", "/swagger-ui/**",    //swagger
+            "/admin/signup", "/admin/signin",       //admin
+            "/api/**",                              //image api
+            "/customer/signup", "/customer/signin",    //customer
+            "/movie/detail", "/movie/all", "/movie/cast/detail",  //movie
+            "/payment/pay", "/payment/method/list", "/payment/detail/nonmember",   //payment
+            "/schedule/date/**", "/schedule/movie/**", "/schedule/allMovie", "/schedule/previous", "/schedule/{id}/seats", "/schedule/{id}/seats/ticket",   //schedule
+            "/theater/{id}", "/theater/{id}/seat", "/theater/all",     //theater
+            "/ticket/reservation", "/ticket/nonmember/**",  "/ticket/delete"   //ticket
     };
     private static final String[] URL_ADMIN_ONLY = {
-            "/movie/register",
-            "/movie/genre/add",
-            "/movie/genre/delete",
-            "/movie/genre/modify",
-            "/theater/register",
-            "/theater/{id}/seat/register",
-            "/theater/modify",
-            "/theater/{id}/seat/modify",
-            "/theater/{id}/delete",
-            "/theater/{id}/seat/delete",
-            "/schedule/add",
-            "/schedule/{id}/modify",
-            "/schedule/{id}/delete",
-            "/schedule/previous",
-            "/admin/modify",
-            "/admin/delete"
+            "/admin/**",      //admin
+            "/movie/**", "/movie/genre/**", "/movie/rating/**", "/movie/cast/**", "/movie/{movieId}/role/**",   //movie
+            "/schedule/add", "/schedule/{id}/modify", "/schedule/{id}/delete",     //schedule
+            "/theater/**", "/theater/{id}/**", "/theater/{id}/seat/**"     //theater
+    };
+
+    private static final String[] URL_CUSTOMER_ONLY = {
+            "/customer/**",             //customer
+            "/payment/list", "/payment/detail/member",    //payment
+            "/ticket/member/**"    //ticket
     };
 
     @Bean
@@ -89,8 +80,9 @@ public class SecurityConfig {
 
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers(URL_ADMIN_ONLY).hasRole("ADMIN")
                 .requestMatchers(URL_TO_PERMIT).permitAll()
+                .requestMatchers(URL_ADMIN_ONLY).hasRole("ADMIN")
+                .requestMatchers(URL_CUSTOMER_ONLY).hasRole("USER")
                 .anyRequest().authenticated();
 
         http

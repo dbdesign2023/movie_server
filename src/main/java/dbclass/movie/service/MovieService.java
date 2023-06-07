@@ -246,11 +246,6 @@ public class MovieService {
         return MovieMapper.movieToMovieDTO(movie, genreRegisterRepository.findAllByMovie(movie).stream().map(genreRegister -> genreRegister.getGenre().getName()).collect(Collectors.toList()));
     }
 
-    @Transactional(readOnly = true)
-    public boolean hasPoster(String path) {
-        return imageRepository.existsByFileUrl(path);
-    }
-
     @Transactional
     public void deleteCast(Long castId) {
         castRepository.deleteById(castId);

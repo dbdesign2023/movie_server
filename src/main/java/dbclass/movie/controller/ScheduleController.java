@@ -94,4 +94,12 @@ public class ScheduleController {
         return ticketService.getTicketedSeats(scheduleId, originalSeats);
     }
 
+    @GetMapping("/{id}/seats/ticket")
+    public List<SeatEmptyDTO> getEmptySeatsWithTicket(@PathVariable("id") Long scheduleId, @RequestParam("id") Long ticketId) {
+        ScheduleDTO scheduleDTO = scheduleService.getScheduleDetail(scheduleId);
+
+        List<SeatDTO> originalSeats = theaterService.getSeats(scheduleDTO.getTheaterDTO().getTheaterId());
+        return ticketService.getTicketedSeatsWithTicket(scheduleId, originalSeats, ticketId);
+    }
+
 }

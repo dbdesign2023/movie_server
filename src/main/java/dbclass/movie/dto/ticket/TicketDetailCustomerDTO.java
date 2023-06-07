@@ -14,6 +14,7 @@ import java.util.List;
 public class TicketDetailCustomerDTO {
 
     private Long ticketId;
+    private Long scheduleId;
     private Timestamp ticketTime;
     private Long movieId;
     private String movieTitle;
@@ -24,4 +25,5 @@ public class TicketDetailCustomerDTO {
     private String posterFileName;
     private List<SeatDTO> seats;
     private String discount;
+    private boolean isPayed;
 }

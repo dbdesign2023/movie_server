@@ -30,16 +30,17 @@ public class TicketMapper {
                 .movieName(movieId)
                 .theaterName(theaterName)
                 .startTime(startTime)
+                .isPayed(ticket.getPayment() != null ? ticket.getPayment().isStatus() : false)
                 .build();
     }
 
-    public static CustomerTicketDTO ticketToTicketDTO(Ticket ticket, boolean isPayed) {
+    public static CustomerTicketDTO ticketToTicketDTO(Ticket ticket) {
         return CustomerTicketDTO.builder()
                 .ticketId(ticket.getTicketId())
                 .ticketTime(ticket.getTicketTime())
-                .loginId(ticket.getCustomer().getLoginId())
+                .loginId(ticket.getCustomer() != null ? ticket.getCustomer().getLoginId() : null)
                 .scheduleId(ticket.getSchedule().getScheduleId())
-                .isPayed(isPayed)
+                .isPayed(ticket.getPayment() != null ? ticket.getPayment().isStatus() : false)
                 .build();
     }
 
@@ -49,6 +50,7 @@ public class TicketMapper {
     public static TicketDetailCustomerDTO ticketToTicketDetailCustomerDTO(Ticket ticket) {
         return TicketDetailCustomerDTO.builder()
                 .ticketId(ticket.getTicketId())
+                .scheduleId(ticket.getSchedule().getScheduleId())
                 .ticketTime(ticket.getTicketTime())
                 .movieId(ticket.getSchedule().getMovie().getMovieId())
                 .movieTitle(ticket.getSchedule().getMovie().getTitle())
@@ -58,6 +60,7 @@ public class TicketMapper {
                 .runningTime(ticket.getSchedule().getMovie().getRunningTime())
                 .posterFileName(ticket.getSchedule().getMovie().getPoster().getFileName())
                 .discount(ticket.getSchedule().getDiscount())
+                .isPayed(ticket.getPayment() != null ? ticket.getPayment().isStatus() : false)
                 .build();
     }
 }

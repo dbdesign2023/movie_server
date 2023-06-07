@@ -12,7 +12,6 @@ import java.util.List;
 public class NonMemberTicketModifyDTO {
 
     private Long ticketId;
-    private String phoneNo;
     private String password;
     private String newPassword;
     private List<String> seats;

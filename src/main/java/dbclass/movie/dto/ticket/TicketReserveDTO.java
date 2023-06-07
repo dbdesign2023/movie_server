@@ -11,6 +11,7 @@ import java.util.List;
 @ToString
 public class TicketReserveDTO {
 
+    private Long ticketId;
     private String phoneNo;
     private String password;
     private Long scheduleId;

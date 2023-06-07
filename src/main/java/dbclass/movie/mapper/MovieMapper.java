@@ -89,13 +89,11 @@ public class MovieMapper {
 
     public static MovieTitleWithPosterRatingDTO movieToMovieTitleWithPosterRatingDTO(Movie movie) {
 
-        String fileName = movie.getPoster().getUuid() + "_" + movie.getPoster().getFileName();
-
         return MovieTitleWithPosterRatingDTO.builder()
                 .title(movie.getTitle())
                 .movieId(movie.getMovieId())
                 .rating(movie.getRating().getName())
-                .fileName(fileName)
+                .fileName(movie.getPoster().getFileName())
                 .build();
     }
 

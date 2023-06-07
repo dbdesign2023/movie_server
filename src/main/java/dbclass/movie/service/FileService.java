@@ -2,6 +2,8 @@ package dbclass.movie.service;
 
 import dbclass.movie.dto.ImageDTO;
 import dbclass.movie.exceptionHandler.ServerException;
+import dbclass.movie.repository.ImageRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +16,10 @@ import java.util.UUID;
 
 @Service
 @Log4j2
+@RequiredArgsConstructor
 public class FileService {
+
+    private final ImageRepository imageRepository;
 
     @Transactional
     public ImageDTO createImageDTO(String originalSourceName, Path path) {
@@ -40,5 +45,10 @@ public class FileService {
         catch (IOException e) {
             throw new ServerException("파일 저장 경로를 찾을 수 없습니다." + e.getMessage());
         }
+    }
+
+    @Transactional(readOnly = true)
+    public boolean hasImage(String path) {
+        return imageRepository.existsByFileUrl(path);
     }
 }

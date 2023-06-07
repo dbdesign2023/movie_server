@@ -12,7 +12,7 @@ public class SecurityUtil {
     public static String getCurrentUsername() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || authentication.getName() == null) {
+        if (authentication == null || authentication.getName().equals("anonymousUser")) {
             return null;
         }
         return authentication.getName();

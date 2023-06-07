@@ -4,8 +4,6 @@ import dbclass.movie.domain.payment.Payment;
 import dbclass.movie.domain.schedule.Schedule;
 import dbclass.movie.domain.user.Customer;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -27,12 +25,9 @@ public class Ticket {
     @Column(name = "TICKET_ID")
     private Long ticketId;
 
-    @Size(min = 11, max = 11)
     @Column(name = "PHONE_NUMBER")
     private String phoneNo;
 
-    @Size(min = 8, max = 20)
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).{8,20}", message = "비밀번호는 영문, 특수문자, 숫자가 포함된 8~20자리로 설정해주세요.")
     @Column(name = "PASSWORD")
     private String password;
 

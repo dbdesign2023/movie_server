@@ -16,4 +16,5 @@ public class TicketShortDTO {
     private String movieName;
     private String theaterName;
     private Timestamp startTime;
+    private boolean isPayed;
 }

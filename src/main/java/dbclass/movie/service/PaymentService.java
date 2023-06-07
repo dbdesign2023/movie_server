@@ -9,6 +9,7 @@ import dbclass.movie.domain.user.NonMemberDTO;
 import dbclass.movie.dto.payment.PaymentDetailDTO;
 import dbclass.movie.dto.payment.PaymentRegisterDTO;
 import dbclass.movie.dto.payment.PaymentShortDTO;
+import dbclass.movie.exceptionHandler.DataExistsException;
 import dbclass.movie.exceptionHandler.DataNotExistsException;
 import dbclass.movie.exceptionHandler.InvalidAccessException;
 import dbclass.movie.mapper.PaymentMapper;
@@ -36,6 +37,10 @@ public class PaymentService {
     @Transactional
     public PaymentDetailDTO register(PaymentRegisterDTO registerDTO) {
         Ticket ticket = ticketRepository.findById(registerDTO.getTicketId()).orElseThrow(() -> new DataNotExistsException("존재하지 않는 티켓 ID입니다.", "TICKET"));
+
+        if(paymentRepository.existsByTicket(ticket)) {
+            throw new DataExistsException("이미 결제된 티켓입니다.", "Payment");
+        }
         List<TicketSeat> ticketSeats = ticketSeatRepository.findAllByTicketId(registerDTO.getTicketId());
 
         int totalPrice = ticketSeats.stream().mapToInt(ticketSeat -> ticketSeat.getSeat().getPrice()).sum();
@@ -44,7 +49,7 @@ public class PaymentService {
             char type = discount.charAt(discount.length() - 1);
             int scale = Integer.parseInt(discount.substring(0, discount.length()-1));
             switch (type) {
-                case '%': totalPrice = totalPrice * scale / 100;
+                case '%': totalPrice = totalPrice * (100-scale) / 100;
                 break;
                 case '\\': totalPrice = (totalPrice - scale) < 0 ? 0 : totalPrice - scale;
                 break;
@@ -53,7 +58,7 @@ public class PaymentService {
 
         Code code = codeRepository.findById(registerDTO.getCode()).orElseThrow(() -> new DataNotExistsException("존재하지 않는 결제수단입니다.", "PAYMENT"));
 
-        if(!SecurityUtil.getCurrentUsername().isEmpty()) {
+        if(!(SecurityUtil.getCurrentUsername() == null)) {
             Customer customer = ticket.getCustomer();
             int currentPoint = customer.getPoint();
 

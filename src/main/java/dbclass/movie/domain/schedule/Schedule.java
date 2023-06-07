@@ -2,11 +2,13 @@ package dbclass.movie.domain.schedule;
 
 import dbclass.movie.domain.movie.Movie;
 import dbclass.movie.domain.theater.Theater;
+import dbclass.movie.domain.ticket.Ticket;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Builder
@@ -37,4 +39,7 @@ public class Schedule {
     @JoinColumn(name = "THEATER_ID")
     @ManyToOne(fetch = FetchType.LAZY)
     private Theater theater;
+
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.DETACH)
+    private List<Ticket> ticket;
 }
