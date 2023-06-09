@@ -20,50 +20,59 @@ public class TheaterController {
 
     @PostMapping("/register")
     public TheaterDTO registerTheater(@RequestBody TheaterRegisterDTO registerDTO) {
+        log.info("theater register request: " + registerDTO);
         return theaterService.register(registerDTO);
     }
 
     @PostMapping("/{id}/seat/register")
     public void registerSeat(@PathVariable("id") Long theaterId, @RequestBody List<SeatRegisterDTO> seats) {
+        log.info("theater seat register request: " + seats.stream().toArray().toString());
         theaterService.registerSeat(theaterId, seats);
     }
 
     @GetMapping("/{id}")
     public TheaterDTO loadTheater(@PathVariable("id") Long theaterId) {
+        log.info("load theater: " + theaterId);
         return theaterService.getTheater(theaterId);
     }
 
     //좌석 조회
     @GetMapping("/{id}/seat")
     public List<SeatDTO> loadSeats(@PathVariable("id") Long theaterId) {
+        log.info("load seats: " + theaterId);
         return theaterService.getSeats(theaterId);
     }
 
     //상영관 수정
     @PostMapping("/modify")
     public TheaterDTO modifyTheater(@RequestBody TheaterRegisterDTO registerDTO) {
+        log.info("theater modify request: " + registerDTO);
         return theaterService.modifyTheater(registerDTO);
     }
 
     //좌석 수정
     @PostMapping("/{id}/seat/modify")
     public void modifySeat(@PathVariable("id") Long theaterId, @RequestBody SeatRegisterDTO seat) {
+        log.info("theater seat modify request: " + seat);
         theaterService.modifySeat(theaterId, seat);
     }
 
     //상영관 삭제
     @DeleteMapping("/{id}/delete")
     public void deleteTheater(@PathVariable("id") Long theaterId) {
+        log.info("theater delete request: " + theaterId);
         theaterService.deleteTheater(theaterId);
     }
 
     @DeleteMapping("/{id}/seat/delete")
     public void deleteSeat(@PathVariable("id") Long theaterId, @RequestBody SeatDeleteDTO seatToDelete) {
+        log.info("theater seat delete request: " + seatToDelete);
         theaterService.deleteSeat(theaterId, seatToDelete);
     }
 
     @GetMapping("/all")
     public List<TheaterDTO> getAllTheaters() {
+        log.info("load theaters");
         return theaterService.getAllTheater();
     }
 }

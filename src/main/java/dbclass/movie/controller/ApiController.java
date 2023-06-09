@@ -36,7 +36,7 @@ public class ApiController {
     @GetMapping("/posters")
     public ResponseEntity<Resource> getPoster(@RequestParam("fileName") String fileName) {
 
-        log.info(fileName);
+        log.info("poster load request : " + fileName);
 
         String filePath = Paths.get(uploadPath, "poster") + File.separator + fileName;
 
@@ -62,6 +62,7 @@ public class ApiController {
 
     @GetMapping("/profileImage")
     public ResponseEntity<Resource> getProfileImage(@RequestParam("fileName") String fileName) {
+        log.info("profile load request : " + fileName);
 
         String filePath = Paths.get(uploadPath, "cast") + File.separator + fileName;
 

@@ -28,7 +28,7 @@ public class FileService {
         String uuid = UUID.randomUUID().toString();
         String fileUrl = getDirectory(path) + File.separator + uuid + "_" + fileName;
         return ImageDTO.builder()
-                .fileName(fileName)
+                .fileName(uuid + "_" + fileName)
                 .uuid(uuid)
                 .fileUrl(fileUrl)
                 .build();

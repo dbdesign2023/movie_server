@@ -16,6 +16,8 @@ public class ScheduleDTO {
     private LocalDateTime startTime;
     private String discount;
     private Long movieId;
+    private String movieName;
+    private int runningTime;
     private TheaterDTO theaterDTO;
     private int totalSeat;
     private int filledSeat;

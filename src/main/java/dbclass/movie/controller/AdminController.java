@@ -54,12 +54,14 @@ public class AdminController {
 
     @GetMapping("/detail")
     public AdminInfoDTOExcludePassword getAdminInfo() {
+        log.info("admin get info");
         String loginId = SecurityUtil.getCurrentUsername();
         return adminService.getAdminDetail(loginId);
     }
 
     @PostMapping(value = "/modify")
     public ResponseEntity<AdminInfoDTO> adminModify(@Valid @RequestBody AdminInfoDTO modifyDTO) {
+        log.info("admin modify request : " + modifyDTO);
         if(!(modifyDTO.getPassword() == null || modifyDTO.getPassword() == "")) {
             modifyDTO.setPassword(passwordEncoder.encode(modifyDTO.getPassword()));
         }
@@ -74,6 +76,7 @@ public class AdminController {
 
     @DeleteMapping("/delete")
     public ResponseEntity<String> adminDelete(@RequestBody String password) {
+        log.info("admin delete request : " + password);
         String loginId = SecurityUtil.getCurrentUsername();
 
         adminService.deleteAdmin(loginId, password, passwordEncoder);

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 @Log4j2
@@ -130,6 +131,19 @@ public class ExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .message(errorMessage)
                 .errorCode("INVALID_INPUT")
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> fileSizeExceedError(MaxUploadSizeExceededException exception) {
+        log.warn("file size exceeded: " + exception.getMessage());
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .message("최대 크기를 초과하였습니다.")
+                .errorCode("FILE EXCEED")
                 .build();
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);

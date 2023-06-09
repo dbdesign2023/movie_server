@@ -25,8 +25,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.debug("jwt filter chain initiated");
-        log.info("filter came");
         String token = resolveToken(request);
         if(token != null) {
             try {
@@ -43,14 +41,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
         }
 
-        log.debug("jwt filter chain finished");
         filterChain.doFilter(request, response);
     }
 
     private String resolveToken(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
-
-        log.info("token: " + token);
         if(StringUtils.hasText(token) && token.startsWith(BEARER_PREFIX)) {
             return token.substring(7);
         }

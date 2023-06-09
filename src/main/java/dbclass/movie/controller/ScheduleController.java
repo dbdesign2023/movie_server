@@ -31,11 +31,13 @@ public class ScheduleController {
 
     @PostMapping("/add")
     public List<ScheduleDTO> addSchedule(@ModelAttribute ScheduleAddDTO scheduleAddDTO) {
+        log.info("schedule add request: " + scheduleAddDTO);
         return scheduleService.updateSchedule(scheduleAddDTO);
     }
 
     @PostMapping("/{id}/modify")
     public List<ScheduleDTO> modifySchedule(@PathVariable("id") Long scheduleId, @ModelAttribute ScheduleAddDTO scheduleAddDTO) {
+        log.info("schedule modify request: " + scheduleAddDTO);
         if(!scheduleId.equals(scheduleAddDTO.getScheduleId())) {
             throw new InvalidAccessException("잘못된 데이터/링크로 수정을 시도하였습니다.");
         }
@@ -45,11 +47,13 @@ public class ScheduleController {
 
     @DeleteMapping("/{id}/delete")
     public void deleteSchedule(@PathVariable("id") Long scheduleId) {
+        log.info("schedule delete request: " + scheduleId);
         scheduleService.deleteSchedule(scheduleId);
     }
 
     @GetMapping("/date/{date}")
     public List<ScheduleDTO> getScheduleByDate(@PathVariable("date")String date) {
+        log.info("schedule by date: " + date);
         LocalDate now = LocalDate.now();
         LocalDate inputDate = LocalDate.parse(date);
         if(inputDate.isBefore(now)) {
@@ -61,16 +65,19 @@ public class ScheduleController {
     //영화에 따른 상영영화 조회
     @GetMapping("/movie/{movieId}")
     public List<ScheduleDTO> getScheduleByMovie(@PathVariable("movieId") Long movieId) {
+        log.info("schedule by movie: " + movieId);
         return scheduleService.getScheduleSortByMovie(movieId);
     }
 
     @GetMapping("/allMovie")
     public List<MovieTitleWithPosterRatingDTO> getAllShowingMoviesTitle() {
+        log.info("all showing movies");
         return scheduleService.getShowingMoviesOnlyTitle();
     }
 
     @GetMapping("/previous")
     public List<ScheduleDTO> getPreviousSchedules(@RequestParam("start") String startDate, @RequestParam("end") String endDate) {
+        log.info("previous schedules, startDate: " + startDate + ", endDate: " + endDate);
         LocalDate start = LocalDate.parse(startDate);
         LocalDate end = LocalDate.parse(endDate);
         LocalDate now = LocalDate.now();
@@ -88,6 +95,7 @@ public class ScheduleController {
 
     @GetMapping("/{id}/seats")
     public List<SeatEmptyDTO> getEmptySeats(@PathVariable("id") Long scheduleId) {
+        log.info("empty seats load: " + scheduleId);
         ScheduleDTO scheduleDTO = scheduleService.getScheduleDetail(scheduleId);
 
         List<SeatDTO> originalSeats = theaterService.getSeats(scheduleDTO.getTheaterDTO().getTheaterId());
@@ -96,6 +104,7 @@ public class ScheduleController {
 
     @GetMapping("/{id}/seats/ticket")
     public List<SeatEmptyDTO> getEmptySeatsWithTicket(@PathVariable("id") Long scheduleId, @RequestParam("id") Long ticketId) {
+        log.info("empty seats while ticket modifying");
         ScheduleDTO scheduleDTO = scheduleService.getScheduleDetail(scheduleId);
 
         List<SeatDTO> originalSeats = theaterService.getSeats(scheduleDTO.getTheaterDTO().getTheaterId());

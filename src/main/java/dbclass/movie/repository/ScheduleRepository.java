@@ -16,6 +16,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     @Query("select sc from Schedule sc where sc.startTime > :startTime and sc.startTime < :endTime")
     List<Schedule> findAllShowingDuration(Timestamp startTime, Timestamp endTime);
 
-    @Query("select count(*) from Schedule sc where sc.movie.movieId = :movieId")
+    @Query("select count(*) > 0 from Schedule sc where sc.movie.movieId = :movieId")
     boolean existsByMovieId(@Param("movieId") Long movieId);
 }

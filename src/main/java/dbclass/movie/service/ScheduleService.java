@@ -35,6 +35,7 @@ public class ScheduleService {
     private final TicketSeatRepository ticketSeatRepository;
     private final SeatRepository seatRepository;
     private final GenreRegisterRepository genreRegisterRepository;
+    private final RoleRepository roleRepository;
 
     @Transactional
     public List<ScheduleDTO> updateSchedule(ScheduleAddDTO scheduleAddDTO) {
@@ -123,7 +124,12 @@ public class ScheduleService {
     @Transactional(readOnly = true)
     public List<MovieDTO> getShowingMovies() {
         List<Schedule> schedules = getShowingSchedule();
-        return schedules.stream().map(schedule -> schedule.getMovie()).distinct().map(movie -> MovieMapper.movieToMovieDTO(movie, genreRegisterRepository.findAllByMovie(movie).stream().map(genreRegister -> genreRegister.getGenre().getName()).collect(Collectors.toList()))).collect(Collectors.toList());
+        return schedules.stream().map(schedule -> schedule.getMovie()).distinct().map(movie -> MovieMapper.movieToMovieDTO(movie,
+                genreRegisterRepository.findAllByMovie(movie)
+                        .stream()
+                        .map(genreRegister -> genreRegister.getGenre().getName())
+                        .collect(Collectors.toList())
+        , roleRepository.findAllByMovie(movie))).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)

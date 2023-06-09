@@ -27,10 +27,8 @@ public class TicketController {
     //티켓 예매
     @PostMapping("/reservation")
     public ResponseEntity<TicketDetailCustomerDTO> reserveTicket(@RequestBody TicketReserveDTO ticketReserveDTO) {
-
+        log.info("ticket reserve request: " + ticketReserveDTO);
         String loginId = SecurityUtil.getCurrentUsername();
-        log.info(loginId);
-        log.info(ticketReserveDTO);
 
         //비회원의 경우
         if(loginId == null && (ticketReserveDTO.getPassword() == null || ticketReserveDTO.getPhoneNo() == null)) {
@@ -54,6 +52,7 @@ public class TicketController {
     //고객이 티켓 예매 목록 확인
     @GetMapping("/member/list")
     public List<TicketShortDTO> getCustomerTicketList() {
+        log.info("load member ticket list");
         String loginId = SecurityUtil.getCurrentUsername();
         return ticketService.getCustomerTicketList(loginId);
     }
@@ -61,6 +60,7 @@ public class TicketController {
     //티켓 수정(회원)
     @PostMapping("/member/modify")
     public TicketDetailCustomerDTO modifyTicket(@RequestBody TicketReserveDTO ticketReserveDTO) {
+        log.info("ticket modify member request: " +ticketReserveDTO);
         String loginId = SecurityUtil.getCurrentUsername();
 
         CustomerTicketDTO customerTicketDTO = ticketService.getTicket(ticketReserveDTO.getTicketId());
@@ -77,6 +77,7 @@ public class TicketController {
 
     @GetMapping("/member/detail")
     public TicketDetailCustomerDTO getTicketDetail(@RequestParam("ticketId") Long ticketId) {
+        log.info("ticket detail member: " + ticketId);
         if(!ticketService.getTicket(ticketId).getLoginId().equals(SecurityUtil.getCurrentUsername())) {
             throw new InvalidAccessException("해당 회원의 티켓이 아닙니다.");
         }
@@ -86,11 +87,13 @@ public class TicketController {
 
     @GetMapping("/nonmember/detail")
     public TicketDetailCustomerDTO getTicketDetail(@RequestParam("ticketId") Long ticketId, @RequestParam("password") String password) {
+        log.info("ticket detail nonmember: " + ticketId);
         return ticketService.getTicketDetail(ticketId, password);
     }
 
     @PostMapping("/nonmember/modify")
     public TicketDetailCustomerDTO modifyTicket(@RequestBody NonMemberTicketModifyDTO modifyDTO) {
+        log.info("ticket modify request nonmember: " + modifyDTO);
         CustomerTicketDTO ticketDTO = ticketService.getTicket(modifyDTO.getTicketId());
         if(ticketDTO.isPayed()) {
             throw new InvalidAccessException("이미 결제된 티켓은 수정이 불가합니다. 취소 후 다시 진행해주세요.");
@@ -101,6 +104,7 @@ public class TicketController {
 
     @DeleteMapping("/delete")
     public void deleteTicket(@RequestParam("ticketId") Long ticketId, @RequestBody String password) {
+        log.info("ticket delete request: " + ticketId);
         ticketService.deleteTicket(ticketId, password);
     }
 

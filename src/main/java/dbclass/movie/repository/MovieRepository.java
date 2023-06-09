@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     boolean existsByRating(Code rating);
+
+    void deleteByMovieId(Long movieId);
 }

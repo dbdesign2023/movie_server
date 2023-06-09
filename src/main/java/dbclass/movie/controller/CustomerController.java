@@ -27,7 +27,7 @@ public class CustomerController {
 
     @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> customerSignup(@Valid @ModelAttribute CustomerInfoDTO signupDTO) {
-        log.debug("signup request: " + signupDTO);
+        log.info("customer signup request: " + signupDTO);
         signupDTO.setPassword(passwordEncoder.encode(signupDTO.getPassword()));
         customerService.signup(signupDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -35,7 +35,7 @@ public class CustomerController {
 
     @PostMapping(value = "/signin", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> customerSignIn(@ModelAttribute LoginDTO loginDTO) {
-        log.debug("signin request: " + loginDTO);
+        log.info("customer signin request: " + loginDTO);
         JwtToken token = customerService.signIn(loginDTO);
 
         ResponseCookie responseCookie = ResponseCookie
@@ -55,14 +55,14 @@ public class CustomerController {
 
     @GetMapping("/getCustomerData")
     public CustomerInfoToClientDTO getCustomerData() {
-        log.debug("get customer data");
+        log.info("customer data request");
         String loginId = SecurityUtil.getCurrentUsername();
         return customerService.getData(loginId);
     }
 
     @PostMapping(value = "/modify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> customerModify(@Valid @ModelAttribute CustomerInfoDTO modifyDTO) {
-        log.debug("modify customer data: " + modifyDTO);
+        log.info("customer modify request: " + modifyDTO);
 
         if(!(modifyDTO.getPassword() == null || modifyDTO.getPassword() == "")) {
             modifyDTO.setPassword(passwordEncoder.encode(modifyDTO.getPassword()));
@@ -75,7 +75,7 @@ public class CustomerController {
 
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteCustomer(@RequestBody String password) {
-        log.info(password);
+        log.info("customer delete request: " + password);
         String loginId = SecurityUtil.getCurrentUsername();
 
         customerService.deleteCustomer(loginId, password, passwordEncoder);

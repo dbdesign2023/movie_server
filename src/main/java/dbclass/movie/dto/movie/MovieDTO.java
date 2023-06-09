@@ -23,4 +23,5 @@ public class MovieDTO {
     private CastInMovieDTO director;
     private String rating;
     private List<String> genreList;
+    private List<RoleInMovieDTO> roleList;
 }

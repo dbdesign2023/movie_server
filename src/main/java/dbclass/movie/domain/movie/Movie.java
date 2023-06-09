@@ -57,4 +57,7 @@ public class Movie {
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
     private List<Role> roles;
 
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    private List<GenreRegister> genreList;
+
 }

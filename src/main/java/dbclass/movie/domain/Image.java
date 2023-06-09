@@ -1,5 +1,6 @@
 package dbclass.movie.domain;
 
+import dbclass.movie.domain.movie.Movie;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

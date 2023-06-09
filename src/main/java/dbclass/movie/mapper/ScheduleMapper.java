@@ -33,6 +33,8 @@ public class ScheduleMapper {
                 .startTime(schedule.getStartTime().toLocalDateTime())
                 .discount(schedule.getDiscount())
                 .movieId(schedule.getMovie().getMovieId())
+                .movieName(schedule.getMovie().getTitle())
+                .runningTime(schedule.getMovie().getRunningTime())
                 .build();
     }
 }

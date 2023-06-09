@@ -27,7 +27,7 @@ public class MovieMapper {
                 .build();
     }
 
-    public static MovieDTO movieToMovieDTO(Movie movie, List<String> genreList) {
+    public static MovieDTO movieToMovieDTO(Movie movie, List<String> genreList, List<Role> roleList) {
         return MovieDTO.builder()
                 .movieId(movie.getMovieId())
                 .title(movie.getTitle())
@@ -40,6 +40,17 @@ public class MovieMapper {
                 .director(castToCastInMovieDTO(movie.getDirector()))
                 .rating(movie.getRating().getName())
                 .genreList(genreList)
+                .roleList(roleList.stream().map(role -> roleToRoleInMovieDTO(role)).collect(Collectors.toList()))
+                .build();
+    }
+
+    private static RoleInMovieDTO roleToRoleInMovieDTO(Role role) {
+        return RoleInMovieDTO.builder()
+                .role(role.getRole())
+                .castId(role.getCast().getCastId())
+                .name(role.getCast().getName())
+                .starring(role.isStarring())
+                .profileImage(role.getCast().getProfileImage().getFileName())
                 .build();
     }
 
@@ -76,6 +87,8 @@ public class MovieMapper {
         return CastInMovieDTO.builder()
                 .castId(cast.getCastId())
                 .name(cast.getName())
+                .birthDate(cast.getBirthDate())
+                .nationality(cast.getNationality())
                 .build();
     }
 
@@ -101,6 +114,8 @@ public class MovieMapper {
         return MovieTitleDTO.builder()
                 .title(movie.getTitle())
                 .movieId(movie.getMovieId())
+                .directorName(movie.getDirector().getName())
+                .releaseDate(movie.getReleaseDate())
                 .build();
     }
 
@@ -108,6 +123,7 @@ public class MovieMapper {
         return CastDTO.builder()
                 .castId(cast.getCastId())
                 .birthDate(cast.getBirthDate())
+                .name(cast.getName())
                 .info(cast.getInfo())
                 .nationality(cast.getNationality())
                 .profileImage(imageToImageDTO(cast.getProfileImage()))
