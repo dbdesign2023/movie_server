@@ -17,6 +17,9 @@ public interface CodeRepository extends JpaRepository<Code, String> {
     @Query("select c from Code c where c.code = 'PM0'")
     Code findPaymentMethodUpperCode();
 
+    @Query("select c from Code c where c.code = 'TH0'")
+    Code findTheaterTypeUpperCode();
+
     List<Code> findAllByUpperCode(Code code);
 
     boolean existsByName(String name);

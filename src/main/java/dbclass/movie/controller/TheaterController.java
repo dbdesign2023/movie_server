@@ -1,8 +1,11 @@
 package dbclass.movie.controller;
 
+import dbclass.movie.domain.Code;
 import dbclass.movie.dto.theater.*;
+import dbclass.movie.exceptionHandler.InvalidAccessException;
 import dbclass.movie.service.TheaterService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
@@ -74,5 +77,34 @@ public class TheaterController {
     public List<TheaterDTO> getAllTheaters() {
         log.info("load theaters");
         return theaterService.getAllTheater();
+    }
+
+    @GetMapping("/type/list")
+    public List<Code> getTheaterTypeList() {
+        return theaterService.loadTheaterTypeList();
+    }
+
+    @PostMapping("/type/add")
+    public List<Code> addTheaterType(@Valid @RequestBody TheaterTypeDTO theaterTypeDTO) {
+        log.info("theater code add request: " + theaterTypeDTO);
+        if(theaterTypeDTO.getCode() == null || theaterTypeDTO.getName() == null) {
+            throw new InvalidAccessException("데이터가 비어있습니다.");
+        }
+        return theaterService.addTheaterType(theaterTypeDTO);
+    }
+
+    @PostMapping("/type/modify")
+    public List<Code> modifyTheaterType(@Valid @RequestBody TheaterTypeDTO theaterTypeDTO) {
+        log.info("theater code modify request: " + theaterTypeDTO);
+        if(theaterTypeDTO.getCode() == null || theaterTypeDTO.getName() == null) {
+            throw new InvalidAccessException("데이터가 비어있습니다.");
+        }
+        return theaterService.updateTheaterType(theaterTypeDTO);
+    }
+
+    @DeleteMapping("/type/delete")
+    public void deleteTheaterType(@RequestParam("id") String code) {
+        log.info("theater type delete request: " + code);
+        theaterService.deleteTheaterType(code);
     }
 }

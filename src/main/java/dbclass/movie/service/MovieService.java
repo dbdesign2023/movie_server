@@ -217,6 +217,12 @@ public class MovieService {
         Movie movie = movieRepository.findById(movieId).orElseThrow(() -> new DataNotExistsException("존재하지 않는 영화 ID입니다.", "movie"));
         Cast cast = castRepository.findById(roleAddDTO.getCastId()).orElseThrow(() -> new DataNotExistsException("존재하지 않는 배우 ID입니다.", "cast"));
 
+        RoleId roleId = RoleId.builder().movie(movie).cast(cast).build();
+        if(roleRepository.existsById(roleId)) {
+            roleRepository.updateRoleById(roleId, roleAddDTO.getRole(), roleAddDTO.isStarring());
+            return;
+        }
+
         Role role = Role.builder()
                 .movie(movie)
                 .cast(cast)
@@ -299,6 +305,8 @@ public class MovieService {
 
     @Transactional
     public void deleteCast(Long castId) {
+        Cast cast = castRepository.findById(castId).orElseThrow(() -> new DataNotExistsException("존재하지 않는 배우 ID입니다", "CAST"));
+        imageRepository.deleteById(cast.getProfileImage().getImageId());
         castRepository.deleteById(castId);
     }
 
