@@ -10,5 +10,6 @@ import java.util.List;
 public interface GenreRegisterRepository extends JpaRepository<GenreRegister, GenreRegisterId> {
 
     List<GenreRegister> findAllByMovie(Movie movie);
+
     void deleteAllByMovie(Movie movie);
 }

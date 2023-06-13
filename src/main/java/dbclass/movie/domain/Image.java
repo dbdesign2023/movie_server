@@ -26,4 +26,5 @@ public class Image {
     private String fileName;
     @Column(name = "FILE_URL", nullable = false)
     private String fileUrl;
+
 }

@@ -29,7 +29,7 @@ public class AuthorityService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
-        return authorityRepository.findByLoginId(loginId).map(this::createUserDetails).orElseThrow(() -> new InvalidAccessException("오류"));
+        return authorityRepository.findByLoginId(loginId).map(this::createUserDetails).orElseThrow(() -> new InvalidAccessException("존재하지 않는 사용자입니다."));
     }
     private UserDetails createUserDetails(UserAuthority authority) {
         GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(authority.getAuthority());

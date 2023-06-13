@@ -15,4 +15,5 @@ public class CastInMovieDTO {
     private String name;
     private Date birthDate;
     private String nationality;
+    private String fileName;
 }

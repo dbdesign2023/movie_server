@@ -28,9 +28,9 @@ public class TheaterController {
     }
 
     @PostMapping("/{id}/seat/register")
-    public void registerSeat(@PathVariable("id") Long theaterId, @RequestBody List<SeatRegisterDTO> seats) {
-        log.info("theater seat register request: " + seats.stream().toArray().toString());
-        theaterService.registerSeat(theaterId, seats);
+    public void registerSeat(@PathVariable("id") Long theaterId, @RequestBody SeatRegisterDTO seatRegisterDTO) {
+        log.info("theater seat register request: " + seatRegisterDTO.getSeatIds().toString());
+        theaterService.registerSeat(theaterId, seatRegisterDTO);
     }
 
     @GetMapping("/{id}")
@@ -57,7 +57,7 @@ public class TheaterController {
     @PostMapping("/{id}/seat/modify")
     public void modifySeat(@PathVariable("id") Long theaterId, @RequestBody SeatRegisterDTO seat) {
         log.info("theater seat modify request: " + seat);
-        theaterService.modifySeat(theaterId, seat);
+        theaterService.modifySeatList(theaterId, seat);
     }
 
     //상영관 삭제
@@ -68,9 +68,9 @@ public class TheaterController {
     }
 
     @DeleteMapping("/{id}/seat/delete")
-    public void deleteSeat(@PathVariable("id") Long theaterId, @RequestBody SeatDeleteDTO seatToDelete) {
-        log.info("theater seat delete request: " + seatToDelete);
-        theaterService.deleteSeat(theaterId, seatToDelete);
+    public void deleteSeat(@PathVariable("id") Long theaterId, @RequestBody SeatDeleteRegisterDTO seatDeleteRegisterDTO) {
+        log.info("theater seat delete request: " + seatDeleteRegisterDTO);
+        theaterService.deleteSeatList(theaterId, seatDeleteRegisterDTO);
     }
 
     @GetMapping("/all")

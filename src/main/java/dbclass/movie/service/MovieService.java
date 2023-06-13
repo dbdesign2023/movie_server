@@ -69,7 +69,7 @@ public class MovieService {
                         .stream()
                         .map(genreRegister -> genreRegister.getGenre().getName())
                         .collect(Collectors.toList())
-                , roleRepository.findAllByMovie(movieSaved)
+                , roleRepository.findAllByMovie(movieSaved).stream().sorted(Comparator.comparing(Role::isStarring).reversed().thenComparing(role -> role.getCast().getName())).collect(Collectors.toList())
         );
     }
 
@@ -111,7 +111,7 @@ public class MovieService {
                         .stream()
                         .map(genreRegister -> genreRegister.getGenre().getName())
                         .collect(Collectors.toList())
-                , roleRepository.findAllByMovie(movie)
+                , roleRepository.findAllByMovie(movieSaved).stream().sorted(Comparator.comparing(Role::isStarring).reversed().thenComparing(role -> role.getCast().getName())).collect(Collectors.toList())
         );
 
     }
@@ -300,14 +300,14 @@ public class MovieService {
 
         return MovieMapper.movieToMovieDTO(movie,
                 genreRegisterRepository.findAllByMovie(movie).stream().map(genreRegister -> genreRegister.getGenre().getName()).collect(Collectors.toList())
-        , roleRepository.findAllByMovie(movie));
+                , roleRepository.findAllByMovie(movie).stream().sorted(Comparator.comparing(Role::isStarring).reversed().thenComparing(role -> role.getCast().getName())).collect(Collectors.toList()));
     }
 
     @Transactional
     public void deleteCast(Long castId) {
         Cast cast = castRepository.findById(castId).orElseThrow(() -> new DataNotExistsException("존재하지 않는 배우 ID입니다", "CAST"));
-        imageRepository.deleteById(cast.getProfileImage().getImageId());
         castRepository.deleteById(castId);
+        imageRepository.deleteById(cast.getProfileImage().getImageId());
     }
 
     @Transactional
@@ -350,7 +350,10 @@ public class MovieService {
 
         Movie movie = movieRepository.findById(movieId).orElseThrow(() -> new DataNotExistsException("존재하지 않는 영화입니다.", "Movie"));
 
+        genreRegisterRepository.deleteAllByMovie(movie);
+
         movieRepository.deleteById(movieId);
+
         imageRepository.deleteById(movie.getPoster().getImageId());
     }
 //

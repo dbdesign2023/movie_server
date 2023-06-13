@@ -30,13 +30,13 @@ public class ScheduleController {
     private final TicketService ticketService;
 
     @PostMapping("/add")
-    public List<ScheduleDTO> addSchedule(@ModelAttribute ScheduleAddDTO scheduleAddDTO) {
+    public List<ScheduleDTO> addSchedule(@RequestBody ScheduleAddDTO scheduleAddDTO) {
         log.info("schedule add request: " + scheduleAddDTO);
         return scheduleService.updateSchedule(scheduleAddDTO);
     }
 
     @PostMapping("/{id}/modify")
-    public List<ScheduleDTO> modifySchedule(@PathVariable("id") Long scheduleId, @ModelAttribute ScheduleAddDTO scheduleAddDTO) {
+    public List<ScheduleDTO> modifySchedule(@PathVariable("id") Long scheduleId, @RequestBody ScheduleAddDTO scheduleAddDTO) {
         log.info("schedule modify request: " + scheduleAddDTO);
         if(!scheduleId.equals(scheduleAddDTO.getScheduleId())) {
             throw new InvalidAccessException("잘못된 데이터/링크로 수정을 시도하였습니다.");

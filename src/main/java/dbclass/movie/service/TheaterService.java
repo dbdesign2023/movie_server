@@ -8,7 +8,6 @@ import dbclass.movie.dto.theater.*;
 import dbclass.movie.exceptionHandler.DataExistsException;
 import dbclass.movie.exceptionHandler.DataNotExistsException;
 import dbclass.movie.exceptionHandler.InvalidDataException;
-import dbclass.movie.mapper.MovieMapper;
 import dbclass.movie.mapper.SeatMapper;
 import dbclass.movie.mapper.TheaterMapper;
 import dbclass.movie.repository.CodeRepository;
@@ -19,6 +18,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,10 +42,23 @@ public class TheaterService {
     }
 
     @Transactional
-    public void registerSeat(Long theaterId, List<SeatRegisterDTO> seatToRegister) {
+    public void registerSeat(Long theaterId, SeatRegisterDTO seatToRegister) {
         Theater theater = theaterRepository.findById(theaterId).orElseThrow(() -> new DataNotExistsException("존재하지 않는 상영관ID입니다.", "Theater"));
 
-        List<Seat> seats = seatToRegister.stream().map(seatRegisterDTO -> SeatMapper.seatRegisterDTOToSeat(seatRegisterDTO, theater)).collect(Collectors.toList());
+        seatToRegister.getSeatIds().forEach(seatId -> {
+            if(seatId.charAt(0) < 'A' || seatId.charAt(0) > 'Z') {
+                throw new InvalidDataException("열은 A~Z의 대문자이어야 합니다: " + seatId);
+            }
+            if(Integer.parseInt(seatId.substring(1)) <= 0) {
+                throw new InvalidDataException("행은 0이하의 숫자는 불가능합니다: " + seatId);
+            }
+        });
+        List<Seat> seats = seatToRegister.getSeatIds().stream().map(seatId -> SeatMapper.seatRegisterDTOToSeat(seatId, seatToRegister.getPrice(), theater)).collect(Collectors.toList());
+        seats.forEach(seat -> {
+            if(seatRepository.existsBySeatIdAndTheater(seat.getSeatId(), theater)) {
+                throw new DataExistsException("이미 존재하는 좌석입니다: " + seat.getSeatId(), "SEAT");
+            }
+        });
         seatRepository.saveAll(seats.stream().distinct().collect(Collectors.toList()));
     }
 
@@ -56,7 +70,7 @@ public class TheaterService {
 
     @Transactional(readOnly = true)
     public List<TheaterDTO> getAllTheater() {
-        return theaterRepository.findAll().stream().map(theater -> TheaterMapper.theaterToTheaterDTO(theater)).collect(Collectors.toList());
+        return theaterRepository.findAll().stream().sorted(Comparator.comparing(Theater::getName)).map(theater -> TheaterMapper.theaterToTheaterDTO(theater)).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -81,18 +95,24 @@ public class TheaterService {
     }
 
     @Transactional
-    public void modifySeat(Long theaterId, SeatRegisterDTO seatToModify) {
+    public void modifySeatList(Long theaterId, SeatRegisterDTO seatToModify) {
         Theater theater = theaterRepository.findById(theaterId).orElseThrow(() -> new DataNotExistsException("존재하지 않는 상영관 ID입니다.", "Theater"));
 
-        if(!seatToModify.getSeatLocation().equals(seatToModify.getOriginalSeatId())) {
-            SeatId seatId = SeatId.builder()
-                .theater(theater)
-                .seatId(seatToModify.getOriginalSeatId())
-                .build();
-            seatRepository.deleteById(seatId);
-        }
-
-        seatRepository.save(SeatMapper.seatRegisterDTOToSeat(seatToModify, theater));
+        seatToModify.getSeatIds().forEach(seatId -> {
+            if(seatId.charAt(0) < 'A' || seatId.charAt(0) > 'Z') {
+                throw new InvalidDataException("열은 A~Z의 대문자이어야 합니다: " + seatId);
+            }
+            if(Integer.parseInt(seatId.substring(1)) <= 0) {
+                throw new InvalidDataException("행은 0이하의 숫자는 불가능합니다: " + seatId);
+            }
+        });
+        List<Seat> seats = seatToModify.getSeatIds().stream().map(seatId -> SeatMapper.seatRegisterDTOToSeat(seatId, seatToModify.getPrice(), theater)).collect(Collectors.toList());
+        seats.forEach(seat -> {
+            if(!seatRepository.existsBySeatIdAndTheater(seat.getSeatId(), theater)) {
+                throw new DataNotExistsException("존재하지 않는 좌석입니다: " + seat.getSeatId(), "SEAT");
+            }
+        });
+        seatRepository.updateSeatPriceByList(seatToModify.getSeatIds(), theater, seatToModify.getPrice());
     }
 
     @Transactional
@@ -101,15 +121,12 @@ public class TheaterService {
     }
 
     @Transactional
-    public void deleteSeat(Long theaterId, SeatDeleteDTO seatToDelete) {
+    public void deleteSeatList(Long theaterId, SeatDeleteRegisterDTO seatIds) {
         Theater theater = theaterRepository.findById(theaterId).orElseThrow(() -> new DataNotExistsException("존재하지 않는 상영관 ID입니다.", "Theater"));
+        List<String> seatIdParsed = Arrays.stream(seatIds.getSeatsToDelete().split(",")).toList();
+        List<SeatId> seats = seatIdParsed.stream().map(seat -> SeatId.builder().theater(theater).seatId(seat).build()).collect(Collectors.toList());
 
-        SeatId seatId = SeatId.builder()
-                .theater(theater)
-                .seatId(seatToDelete.getRow() + Integer.toString(seatToDelete.getColumn()))
-                .build();
-
-        seatRepository.deleteById(seatId);
+        seatRepository.deleteAllById(seats);
     }
 
     @Transactional(readOnly = true)

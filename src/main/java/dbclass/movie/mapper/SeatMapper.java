@@ -12,12 +12,12 @@ public class SeatMapper {
 
     private SeatMapper() {}
 
-    public static Seat seatRegisterDTOToSeat(SeatRegisterDTO seatRegisterDTO, Theater theater) {
+    public static Seat seatRegisterDTOToSeat(String seatId, int price, Theater theater) {
         return Seat.builder()
                 .theater(theater)
-                .row(seatRegisterDTO.getSeatLocation().charAt(0))
-                .column(Integer.parseInt(seatRegisterDTO.getSeatLocation().substring(1)))
-                .price(seatRegisterDTO.getPrice())
+                .row(seatId.charAt(0))
+                .column(Integer.parseInt(seatId.substring(1)))
+                .price(price)
                 .build();
     }
 

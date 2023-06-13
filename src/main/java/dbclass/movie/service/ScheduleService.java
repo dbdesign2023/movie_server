@@ -1,6 +1,7 @@
 package dbclass.movie.service;
 
 import dbclass.movie.domain.movie.Movie;
+import dbclass.movie.domain.movie.Role;
 import dbclass.movie.domain.schedule.Schedule;
 import dbclass.movie.domain.theater.Theater;
 import dbclass.movie.dto.movie.MovieDTO;
@@ -21,6 +22,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -102,7 +104,6 @@ public class ScheduleService {
 
     private List<Schedule> getShowingSchedule() {
         Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-        log.info(currentTime);
         return scheduleRepository.findAllShowing(currentTime)
                 .stream()
                 .sorted(((o1, o2) -> {
@@ -129,7 +130,7 @@ public class ScheduleService {
                         .stream()
                         .map(genreRegister -> genreRegister.getGenre().getName())
                         .collect(Collectors.toList())
-        , roleRepository.findAllByMovie(movie))).collect(Collectors.toList());
+                , roleRepository.findAllByMovie(movie).stream().sorted(Comparator.comparing(Role::isStarring).reversed().thenComparing(role -> role.getCast().getName())).collect(Collectors.toList()))).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)

@@ -2,6 +2,8 @@ package dbclass.movie.dto.theater;
 
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -9,7 +11,6 @@ import lombok.*;
 @ToString
 public class SeatRegisterDTO {
 
-    private String originalSeatId;
-    private String seatLocation;
+    private List<String> seatIds;
     private int price;
 }

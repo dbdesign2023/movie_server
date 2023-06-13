@@ -16,7 +16,6 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOriginPatterns("*")
                 .allowedHeaders("*")
                 .allowedMethods("GET", "POST", "DELETE", "OPTIONS")
-                .allowCredentials(true)
                 .allowedHeaders("*");
     }
 

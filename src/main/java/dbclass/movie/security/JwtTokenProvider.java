@@ -27,7 +27,7 @@ public class JwtTokenProvider {
 
     private final Key encodedKey;
     private static final String BEARER_TYPE = "Bearer";
-    private static final Long accessTokenValidationTime = 30 * 60 * 1000L;   //30분
+    private static final Long accessTokenValidationTime = 5 * 60 * 60 * 1000L;   //30분
     private static final Long refreshTokenValidationTime = 24 * 60 * 60 * 1000L;  //1일
 
     public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {

@@ -89,6 +89,7 @@ public class MovieMapper {
                 .name(cast.getName())
                 .birthDate(cast.getBirthDate())
                 .nationality(cast.getNationality())
+                .fileName(cast.getProfileImage().getFileName())
                 .build();
     }
 

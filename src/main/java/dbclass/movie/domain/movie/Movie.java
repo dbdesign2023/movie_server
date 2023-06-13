@@ -43,7 +43,7 @@ public class Movie {
     private String language;
 
     @OneToOne
-    @JoinColumn(name = "POSTER", nullable = false)
+    @JoinColumn(name = "POSTER")
     private Image poster;
 
     @OneToOne
